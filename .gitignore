@@ -1,4 +1,6 @@
 vk-sample.py
 mongo-sample.py
 test.py
+credentials.env
+config.ini
 .idea
