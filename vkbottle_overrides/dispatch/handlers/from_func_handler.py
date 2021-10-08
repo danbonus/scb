@@ -1,21 +1,12 @@
 from typing import Callable
 
-from vkbottle.dispatch.rules import ABCRule
 
 from abc import ABC, abstractmethod
 from typing import Any, Union
-
-
-class ABCHandler(ABC):
-    blocking: bool
-
-    @abstractmethod
-    async def filter(self, event: Any) -> Union[dict, bool]:
-        pass
-
-    @abstractmethod
-    async def handle(self, event: Any, scb) -> Any:
-        pass
+from vkbottle_overrides.dispatch.rules.abc import ABCRule
+from .abc import ABCHandler
+import inspect
+import os
 
 
 class FromFuncHandler(ABCHandler):
@@ -24,10 +15,10 @@ class FromFuncHandler(ABCHandler):
         self.rules = rules
         self.blocking = blocking
 
-    async def filter(self, event: Any) -> Union[dict, bool]:
+    async def filter(self, event: Any, scb) -> Union[dict, bool]:
         rule_context = {}
         for rule in self.rules:
-            result = await rule.check(event)
+            result = await rule.check(event, scb)
             if result is False or result is None:
                 return False
             elif result is True:

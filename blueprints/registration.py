@@ -1,17 +1,16 @@
 from datetime import datetime
-from vkbottle.bot import Message, rules
+from vkbottle_overrides.bot import Message, rules
 
 from keyboards import *
-from vkbottle_overrides import Blueprint
+from vkbottle_overrides.bot import Blueprint
 from utils import SCB
 from utils import RegistrationStates
-from rules import NotRegisteredRule
 
 bp = Blueprint()
 bp.name = "Registration"
 
 
-@bp.on.message(FirstEntryRule=True)
+@bp.on.message(FirstEntry=True)
 async def first_entry_handler(message: Message, scb):
     await message.answer(scb.phrases.first_entry, keyboard=REGISTER_KEYBOARD)
     await bp.state_dispenser.set(message.peer_id, RegistrationStates.GRADE_STATE)
@@ -24,7 +23,7 @@ async def first_entry_handler(message: Message, scb):
             rules.LevensteinRule("Пройти регистрацию", 3),
             rules.VBMLRule("1"),
      ),
-    NotRegisteredRule,
+    NotRegistered=True,
     state=RegistrationStates.GRADE_STATE)
 async def reg_grade(message: Message, scb: SCB):
     """Начало регистрации, выбор класса."""
@@ -72,11 +71,10 @@ async def broadcast_enabled(message: Message, scb):
     ),
     state=RegistrationStates.BROADCAST_TYPE
 )   # PHRASES IN RULES
-async def broadcast_type(message: Message, scb):
+async def broadcast_since(message: Message, scb):
     """Если юзер согласился на рассылку первого типа."""
     await message.answer(scb.phrases.broadcast_time_since, keyboard=TIME_SINCE_KEYBOARD)
-    scb.storage.set("broadcast_type", 0)
-    await bp.state_dispenser.set(message.peer_id, RegistrationStates.BROADCAST_TIME)
+    await bp.state_dispenser.set(message.peer_id, RegistrationStates.BROADCAST_TIME, broadcast_type="since")
 
 
 @bp.on.message(
@@ -86,29 +84,31 @@ async def broadcast_type(message: Message, scb):
     ),
     state=RegistrationStates.BROADCAST_TYPE
 )   # PHRASES IN RULES
-async def broadcast_type(message: Message, scb):
+async def broadcast_fixed(message: Message, scb):
     """Если юзер согласился на рассылку второго типа."""
     await message.answer(scb.phrases.broadcast_time_fixed, keyboard=TIME_FIXED_KEYBOARD)
-    scb.storage.set("broadcast_type", 1)
-    await bp.state_dispenser.set(message.peer_id, RegistrationStates.BROADCAST_TIME)
+    await bp.state_dispenser.set(message.peer_id, RegistrationStates.BROADCAST_TIME, broadcast_type="fixed")
     
     
 @bp.on.message(state=RegistrationStates.BROADCAST_TIME)
-async def broadcast_final(message: Message, scb):
+async def broadcast_final(message: Message, scb: SCB):
     """Проверка на соответствие формата даты, окончание регистрации."""
     grade = scb.storage.get("grade")
+    broadcast_type = message.state_peer.payload["broadcast_type"]
 
     try:
         datetime.strptime(message.text, "%H:%M")
         msg = f"да, через {message.text} с конца уроков."
 
-        if scb.storage.get("broadcast_type"):
+        if broadcast_type == "fixed":
             msg = f"да, в {message.text}"
 
         await bp.state_dispenser.set(message.peer_id, RegistrationStates.FINAL_STATE)
     except ValueError:  # неправильный формат времени
         return scb.phrases.broadcast_wrong_format
 
+    await scb.user.register(grade)
+    await scb.user.set_broadcast(broadcast_type=broadcast_type, time=message.text)
     await message.answer(scb.phrases.registration_passed.render(grade=grade, result=msg), keyboard=EMPTY_KEYBOARD)
 
 
@@ -126,7 +126,7 @@ async def broadcast_not_stated(message: Message, scb):
     await message.answer(scb.phrases.broadcast_not_stated)
 
 
-@bp.on.message(NotRegisteredRule)
+@bp.on.message(NotRegistered=True)
 async def registration_handler(message: Message, scb):
     await message.answer(scb.phrases.must_register,
                          keyboard=REGISTER_KEYBOARD)

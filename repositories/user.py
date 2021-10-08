@@ -6,6 +6,7 @@ from utils.async_object import AsyncObject
 
 class UserRepository(AsyncObject):
     async def __init__(self, uid: int, case="nom"):
+        logger.spam("User Repository init")
         storage = CtxStorage()
         self.db = storage.get("db")
         self.uid = uid
@@ -18,12 +19,13 @@ class UserRepository(AsyncObject):
         self.registered = self.record["registered"]
         self.grade = self.record["grade"]
         self.lang = self.record["lang"]
+        self.is_broadcast_subscriber = self.record["is_broadcast_subscriber"]
         self.is_writer = self.record["is_writer"]
         self.is_admin = self.record["is_admin"]
         self.first_name = self.record["name_cases"][case]["first_name"]
         self.last_name = self.record["name_cases"][case]["last_name"]
         self.full_name = self.record["name_cases"][case]["full_name"]
-        self.blocked = self.record["blocked"]
+        self.is_blocked = self.record["is_blocked"]
 
     async def create_new(self):
         logger.debug("New user! Creating a record.")
@@ -40,12 +42,14 @@ class UserRepository(AsyncObject):
 
         return result
 
-    async def update_user(self, info: dict):
+    async def update_user(self, **info):
         await self.db.users.update_one({"uid": self.uid}, info)
 
     async def register(self, grade):
-        self.grade = grade
-        await self.db.users.update_one({"uid": self.uid}, {"grade": grade, "registered": True})
+        await self.update_user(grade=grade, registered=True)
+
+    async def set_broadcast(self, **broadcast_info):
+        await self.update_user(broadcast=broadcast_info)
 
     async def not_newbie_anymore(self):
         await self.db.users.update_one({"uid": self.uid}, {"$unset": {"first_entry": True}})

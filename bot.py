@@ -4,15 +4,14 @@ from middlewares import middlewares
 from rules import rules
 from utils.api import bp, Api
 from vkbottle.bot import Bot
-from vkbottle.tools.dev_tools.utils import load_blueprints_from_package
+from vkbottle_overrides.tools.dev_tools.utils import load_blueprints_from_package
 from vkbottle import CtxStorage
-from vkbottle_overrides import SCBLabeler
+from vkbottle_overrides.bot import SCBLabeler
 import argparse
 
 
 def init_bot(token):
     logger.info("SCB time! Starting.")
-
     lw = LoopWrapper(auto_reload=True)
     bot = Bot(token=token, loop_wrapper=lw)
     bot.labeler = SCBLabeler()
@@ -37,6 +36,7 @@ async def setup_blueprints(bot):
     <привет солнышко я сцб вижу ты тут в первый раз>"""
 
     bp.load(bot)
+    handlers_count = 0
     blueprints = {}
     at_start = {
         "Registration": None
@@ -55,6 +55,8 @@ async def setup_blueprints(bot):
         else:
             blueprints[i.name] = i
 
+        handlers_count += 1
+
     for i in at_start:  # получение объекта blueprint через ключ имени этого блюпринта
         at_start[i].load(bot)
         logger.debug("Loading START handler: %s" % i)
@@ -67,16 +69,28 @@ async def setup_blueprints(bot):
         at_final[i].load(bot)
         logger.debug("Loading FINAL handler: %s" % i)
 
+    logger.info(f"Handlers loaded: {handlers_count}.")
+
 
 async def setup_middlewares(bot):
+    middlewares_count = 0
+
     for i in middlewares:
         bot.labeler.message_view.register_middleware(i)
+        middlewares_count += 1
+
+    logger.info(f"Middlewares loaded: {middlewares_count}.")
 
 
 async def setup_rules(bot):
+    rules_count = 0
+
     for i in rules:
         logger.debug("Loading rule: %s" % i.__name__)  # имя рулза получено из имени файла
         bot.labeler.custom_rules[i.__name__] = i
+        rules_count += 1
+
+    logger.info(f"Rules loaded: {rules_count}")
 
 
 async def setup_api(bot):

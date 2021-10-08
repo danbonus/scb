@@ -10,7 +10,8 @@ async def user(uid):
         "is_admin": False,
         "registered": False,
         "name_cases": await Api.get_cases(uid),
-        "blocked": False,
+        "is_broadcast_subscriber": False,
+        "is_blocked": False,
         "first_entry": True
     }
 

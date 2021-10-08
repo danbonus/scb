@@ -1,15 +1,15 @@
-from vkbottle import BaseMiddleware, MiddlewareResponse, ABCView
+from vkbottle import ABCView
 from logger import logger
-from repositories.user import UserRepository
 from vkbottle.tools.dev_tools.mini_types.bot.message import MessageMin
 from vkbottle.bot import Message
 from typing import List, Any
 
-from vkbottle_overrides import ABCHandler
+from vkbottle_overrides.dispatch.handlers.from_func_handler import FromFuncHandler
+from vkbottle_overrides.dispatch.middlewares.abc import BaseMiddleware
 
 
 class LogMiddleware(BaseMiddleware):
-    async def pre(self, message: MessageMin):
+    async def pre(self, message: MessageMin, scb):
         pass
 
     async def post(
@@ -17,11 +17,9 @@ class LogMiddleware(BaseMiddleware):
             message: Message,
             view: "ABCView",
             handle_responses: List[Any],
-            handlers: List["ABCHandler"],
+            handlers: List["FromFuncHandler"],
     ):
         if not handlers:
             return
 
-        print(f"{len(handlers)} хендлеров сработало на сообщение. "
-              f"Они вернули {handle_responses}, "
-              f"все они принадлежали к view {view}")
+        logger.info(f"Хендлер сработал на сообщение: {handlers[0].handler.__name__}")

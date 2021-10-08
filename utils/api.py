@@ -1,5 +1,6 @@
 from vkbottle.bot import Blueprint
 from vkbottle import vkscript, CtxStorage
+from logger import logger
 
 bp = Blueprint()
 
@@ -62,6 +63,7 @@ class Api:
         )
 
         return album.id
+
 
 #async def check_longpoll_settings():
  #   settings = bp.api.groups.get_long_poll_settings()

@@ -3,7 +3,7 @@ from typing import Optional
 from vkbottle.dispatch import BotRouter
 from vkbottle.bot import Blueprint
 
-from vkbottle_overrides import SCBLabeler
+from vkbottle_overrides.framework.bot.labeler import SCBLabeler
 
 
 class BotBlueprint(Blueprint):

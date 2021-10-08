@@ -1,9 +1,10 @@
 from abc import ABC
-from typing import Optional, Any, Dict, List, NamedTuple, Callable
+from typing import Optional, Any, List, Callable
 
 from vkbottle.api.abc import ABCAPI
 from vkbottle.dispatch.dispenser.abc import ABCStateDispenser
-from vkbottle_overrides import ABCHandler
+from vkbottle_overrides.dispatch.handlers.from_func_handler import ABCHandler
+from vkbottle_overrides.dispatch.middlewares.abc import BaseMiddleware
 from vkbottle.dispatch.middlewares import BaseMiddleware, MiddlewareResponse
 from vkbottle.dispatch.return_manager.bot import BotMessageReturnHandler
 from vkbottle.modules import logger
@@ -36,12 +37,13 @@ class ABCMessageView(ABCDispenseView, ABC):
         context_variables = {}
         message = message_min(event, ctx_api)
         message.state_peer = await state_dispenser.cast(self.get_state_key(event))
+        scb = await SCB(message.from_id, message.client_info)
 
         for text_ax in self.default_text_approximators:
             message.text = text_ax(message)
 
         for middleware in self.middlewares:
-            response = await middleware.pre(message)
+            response = await middleware.pre(message, scb)
             if response == MiddlewareResponse(False):
                 return
             elif isinstance(response, dict):
@@ -51,7 +53,7 @@ class ABCMessageView(ABCDispenseView, ABC):
         handlers = []
 
         for handler in self.handlers:
-            result = await handler.filter(message)
+            result = await handler.filter(message, scb)
             logger.debug("Handler {} returned {}".format(handler, result))
 
             if result is False:
@@ -60,7 +62,6 @@ class ABCMessageView(ABCDispenseView, ABC):
             elif isinstance(result, dict):
                 context_variables.update(result)
 
-            scb = await SCB(message.from_id, message.client_info)
             scb.context.update(context_variables)
 
             handler_response = await handler.handle(message, scb)

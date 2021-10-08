@@ -2,6 +2,7 @@ from repositories import user, phrases, grades, many_users  # CIRCULAR IMPORT ER
 from vkbottle import CtxStorage
 from . import AsyncObject
 
+
 class SCB(AsyncObject):
     async def __init__(self, uid, client_info):
         self.storage: CtxStorage = CtxStorage()
