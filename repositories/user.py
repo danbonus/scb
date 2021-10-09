@@ -10,46 +10,46 @@ class UserRepository(AsyncObject):
         storage = CtxStorage()
         self.db = storage.get("db")
         self.uid = uid
+        self.new = False
         self.record = await self.get_record()
-        self.newbie = False
 
-        if "first_entry" in self.record:
-            self.newbie = True
-
-        self.registered = self.record["registered"]
         self.grade = self.record["grade"]
+        self.registered = self.grade
+
         self.lang = self.record["lang"]
-        self.is_broadcast_subscriber = self.record["is_broadcast_subscriber"]
-        self.is_writer = self.record["is_writer"]
-        self.is_admin = self.record["is_admin"]
+
+        self.broadcast_info = self.record["broadcast_info"]
+        self.is_broadcast_subscriber = self.broadcast_info["subscriber"]
+        self.broadcast_type = self.broadcast_info["type"]
+        self.broadcast_time = self.broadcast_info["time"]
+
+        self.roles = self.record["roles"]
+        self.is_writer = self.roles["writer"]
+        self.is_admin = self.roles["admin"]
+        self.is_blocked = self.roles["blocked"]
+
         self.first_name = self.record["name_cases"][case]["first_name"]
         self.last_name = self.record["name_cases"][case]["last_name"]
         self.full_name = self.record["name_cases"][case]["full_name"]
-        self.is_blocked = self.record["is_blocked"]
 
-    async def create_new(self):
-        logger.debug("New user! Creating a record.")
-        user_model = await user(uid=self.uid)
-        print(user_model)
-        await self.db.users.insert_one(user_model)
-        return await self.get_record()
 
     async def get_record(self):
-        result = await self.db.users.find_one({"uid": self.uid})
+        record = await self.db.users.find_one({"uid": self.uid})
 
-        if not result:
-            result = await self.create_new()
+        if not record:
+            logger.debug("New user! Creating a record.")
+            self.new = True
+            record = await user(uid=self.uid)
 
-        return result
+            await self.db.users.insert_one(record)
+
+        return record
 
     async def update_user(self, **info):
-        await self.db.users.update_one({"uid": self.uid}, info)
+        await self.db.users.update_one({"uid": self.uid}, {"$set": info})
 
     async def register(self, grade):
         await self.update_user(grade=grade, registered=True)
 
     async def set_broadcast(self, **broadcast_info):
-        await self.update_user(broadcast=broadcast_info)
-
-    async def not_newbie_anymore(self):
-        await self.db.users.update_one({"uid": self.uid}, {"$unset": {"first_entry": True}})
+        await self.update_user(broadcast_info=broadcast_info)

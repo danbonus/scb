@@ -14,7 +14,6 @@ bp.name = "Registration"
 async def first_entry_handler(message: Message, scb):
     await message.answer(scb.phrases.first_entry, keyboard=REGISTER_KEYBOARD)
     await bp.state_dispenser.set(message.peer_id, RegistrationStates.GRADE_STATE)
-    await scb.user.not_newbie_anymore()
 
 
 @bp.on.message(
@@ -43,7 +42,7 @@ async def reg_grade(message: Message, scb: SCB):
 
 
 @bp.on.message(state=RegistrationStates.GRADE_CHECK)
-async def grade_check(message: Message, scb):
+async def grade_check(message: Message, scb: SCB):
     """Проверка на существование класса."""
     answer = scb.phrases.wrong_grade
     keyboard = None
@@ -51,7 +50,7 @@ async def grade_check(message: Message, scb):
     if await scb.grades.is_grade(message.text):
         answer = scb.phrases.broadcast % message.text
         keyboard = YN_KEYBOARD
-        scb.storage.set("grade", message.text)
+        scb.storage.set("grade", await scb.grades(message.text))
         await bp.state_dispenser.set(message.peer_id, RegistrationStates.BROADCAST_STATE)
 
     await message.answer(answer, keyboard=keyboard)
@@ -107,16 +106,17 @@ async def broadcast_final(message: Message, scb: SCB):
     except ValueError:  # неправильный формат времени
         return scb.phrases.broadcast_wrong_format
 
-    await scb.user.register(grade)
-    await scb.user.set_broadcast(broadcast_type=broadcast_type, time=message.text)
-    await message.answer(scb.phrases.registration_passed.render(grade=grade, result=msg), keyboard=EMPTY_KEYBOARD)
+    await scb.user.register(grade.id)
+    await scb.user.set_broadcast(subscriber=True, type=broadcast_type, time=message.text)
+    await message.answer(scb.phrases.registration_passed.render(grade=grade.label, result=msg), keyboard=EMPTY_KEYBOARD)
 
 
 @bp.on.message(rules.LevensteinRule("Нет", 3), state=RegistrationStates.BROADCAST_STATE)
 async def broadcast_false(message: Message, scb):
     grade = scb.storage.get("grade")
 
-    await message.answer(scb.phrases.registration_passed.render(grade=grade, result="нет"), keyboard=EMPTY_KEYBOARD)
+    await scb.user.register(grade.id)
+    await message.answer(scb.phrases.registration_passed.render(grade=grade.label, result="нет"), keyboard=EMPTY_KEYBOARD)
     await bp.state_dispenser.set(message.peer_id, RegistrationStates.FINAL_STATE, broadcast=False)
 
 

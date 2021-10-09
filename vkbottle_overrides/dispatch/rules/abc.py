@@ -66,6 +66,7 @@ class OrFilter(ABCFilter):
             check_response = await rule.check(event, scb)
             if check_response is not False:
                 return check_response
+
         return False
 
     @property

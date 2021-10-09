@@ -17,7 +17,7 @@ if __name__ == '__main__':
                         help='Debug mode')
 
     args = parser.parse_args()
-    print(args.debug)
+
     settings = SettingsRepository(args.debug)
     scb = init_bot(settings.token)
     scb.loop_wrapper.on_startup.insert(0, settings.check_group_id(scb.api))

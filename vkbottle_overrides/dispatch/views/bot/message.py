@@ -7,7 +7,7 @@ from vkbottle_overrides.dispatch.handlers.from_func_handler import ABCHandler
 from vkbottle_overrides.dispatch.middlewares.abc import BaseMiddleware
 from vkbottle.dispatch.middlewares import BaseMiddleware, MiddlewareResponse
 from vkbottle.dispatch.return_manager.bot import BotMessageReturnHandler
-from vkbottle.modules import logger
+from logger import logger
 from vkbottle.tools.dev_tools import message_min
 from vkbottle.tools.dev_tools.mini_types.bot import MessageMin
 from vkbottle_types.events import GroupEventType

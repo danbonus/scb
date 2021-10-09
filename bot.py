@@ -11,8 +11,8 @@ import argparse
 
 
 def init_bot(token):
-    logger.info("SCB time! Starting.")
-    lw = LoopWrapper(auto_reload=True)
+    logger.success("SCB time! Starting.")
+    lw = LoopWrapper()
     bot = Bot(token=token, loop_wrapper=lw)
     bot.labeler = SCBLabeler()
     bot.labeler.vbml_ignore_case = True  # беу == БЕУ == бЕу

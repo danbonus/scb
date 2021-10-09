@@ -1,5 +1,5 @@
 from typing import Callable
-
+from logger import logger
 
 from abc import ABC, abstractmethod
 from typing import Any, Union
@@ -17,13 +17,20 @@ class FromFuncHandler(ABCHandler):
 
     async def filter(self, event: Any, scb) -> Union[dict, bool]:
         rule_context = {}
+        rules_passed = []
+
         for rule in self.rules:
             result = await rule.check(event, scb)
+            logger.debug(type(rule))
+            logger.debug(result)
+
             if result is False or result is None:
                 return False
             elif result is True:
+                rules_passed.append(rule)
                 continue
             rule_context.update(result)
+
         return rule_context
 
     async def handle(self, event: Any, scb) -> Any:

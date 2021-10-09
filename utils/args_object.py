@@ -8,7 +8,7 @@ class SCB(AsyncObject):
         self.storage: CtxStorage = CtxStorage()
         self.user: user.UserRepository = await user.UserRepository(uid)
         self.phrases: phrases.PhrasesRepository = phrases.PhrasesRepository(self.user.lang, client_info)
-        self.grades: grades.GradesRepository = await grades.GradesRepository(self.user.grade)
+        self.grades = grades.GradesRepository
         self.many_users: many_users.ManyUsersRepository = many_users.ManyUsersRepository()
         self.context = {}
         self.rule_toggled = None
