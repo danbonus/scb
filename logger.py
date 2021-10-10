@@ -4,8 +4,12 @@ import coloredlogs
 import sys
 
 
+def logger_debug():
+    logger.setLevel(verboselogs.SPAM)
+
+
 logger = verboselogs.VerboseLogger('scb')
-logger.setLevel(verboselogs.SPAM)
+logger.setLevel(logging.INFO)
 
 coloredlogs.DEFAULT_FIELD_STYLES['levelname'] = {"color": "blue"}
 coloredlogs.DEFAULT_FIELD_STYLES['asctime'] = {"color": "magenta"}

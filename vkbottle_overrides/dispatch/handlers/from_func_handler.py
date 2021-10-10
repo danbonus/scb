@@ -21,9 +21,6 @@ class FromFuncHandler(ABCHandler):
 
         for rule in self.rules:
             result = await rule.check(event, scb)
-            logger.debug(type(rule))
-            logger.debug(result)
-
             if result is False or result is None:
                 return False
             elif result is True:

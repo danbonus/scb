@@ -1,10 +1,7 @@
 from vkbottle_overrides.bot import rules, Message, SCB
 
 
-class NotRegistered(rules.ABCMessageRule):
-    def __init__(self, nothing):
-        pass
-
+class Registered(rules.ABCMessageRule):
     async def check(self, message: Message, scb: SCB) -> bool:
-        if not scb.user.registered:
+        if scb.user.registered:
             return True

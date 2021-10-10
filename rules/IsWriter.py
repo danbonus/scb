@@ -1,9 +1,10 @@
 from vkbottle_overrides.bot import rules, Message, SCB
 
-from repositories.user import UserRepository
 
+class IsWriter(rules.ABCMessageRule):
+    def __init__(self, nothing):
+        pass
 
-class RegisteredRule(rules.ABCMessageRule):
     async def check(self, message: Message, scb: SCB) -> bool:
-        if scb.user.registered:
+        if scb.user.is_writer:
             return True

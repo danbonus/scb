@@ -22,4 +22,4 @@ class LogMiddleware(BaseMiddleware):
         if not handlers:
             return
 
-        logger.info(f"Хендлер сработал на сообщение: {handlers[0].handler.__name__}")
+        logger.info(f"Хендлер {handlers[0].handler.__name__} сработал на сообщение.")

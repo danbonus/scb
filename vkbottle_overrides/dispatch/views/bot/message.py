@@ -33,7 +33,7 @@ class ABCMessageView(ABCDispenseView, ABC):
         self, event: dict, ctx_api: "ABCAPI", state_dispenser: "ABCStateDispenser"
     ) -> Any:
 
-        logger.debug("Handling event ({}) with message view".format(event.get("event_id")))
+        # logger.debug("Handling event ({}) with message view".format(event.get("event_id")))
         context_variables = {}
         message = message_min(event, ctx_api)
         message.state_peer = await state_dispenser.cast(self.get_state_key(event))
@@ -54,7 +54,7 @@ class ABCMessageView(ABCDispenseView, ABC):
 
         for handler in self.handlers:
             result = await handler.filter(message, scb)
-            logger.debug("Handler {} returned {}".format(handler, result))
+            # logger.debug("Handler {} returned {}".format(handler, result))
 
             if result is False:
                 continue

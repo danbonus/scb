@@ -34,3 +34,11 @@ for i in ["00:30", "01:00", "01:30", "02:00", "02:30", "03:00"]:
     TIME_SINCE_KEYBOARD.add(Text(i), row=3, color=color)
 
 TIME_SINCE_KEYBOARD = TIME_SINCE_KEYBOARD.get_json()
+
+
+MENU_KEYBOARD = (
+    Keyboard(one_time=False, inline=False)
+    .add(Text("Помощь"))
+    .add(Text("ДЗ"))
+    .add(Text("Рассылка"))
+)

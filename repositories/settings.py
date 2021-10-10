@@ -2,7 +2,7 @@ import os
 import argparse
 from distutils.util import strtobool
 
-from logger import logger
+from logger import logger_debug
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
 from vkbottle import CtxStorage
@@ -37,6 +37,7 @@ class SettingsRepository:
 
         if config.getboolean("bot", "debug"):
             self.mode = "debug"
+            logger_debug()
 
         if self.mode == "prod":
             section = "credentials"

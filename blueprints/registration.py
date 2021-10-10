@@ -11,8 +11,8 @@ bp.name = "Registration"
 
 
 @bp.on.message(FirstEntry=True)
-async def first_entry_handler(message: Message, scb):
-    await message.answer(scb.phrases.first_entry, keyboard=REGISTER_KEYBOARD)
+async def first_entry_handler(message: Message, scb: SCB):
+    await message.answer(scb.phrases.registration.first_entry, keyboard=REGISTER_KEYBOARD)
     await bp.state_dispenser.set(message.peer_id, RegistrationStates.GRADE_STATE)
 
 
@@ -26,7 +26,7 @@ async def first_entry_handler(message: Message, scb):
     state=RegistrationStates.GRADE_STATE)
 async def reg_grade(message: Message, scb: SCB):
     """Начало регистрации, выбор класса."""
-    answer = scb.phrases.reg_grade
+    answer = scb.phrases.grades.reg
     grades = [grade.label for grade in await scb.grades.get_grades()]
 
     GRADE_KEYBOARD = Keyboard(one_time=False, inline=False)
@@ -44,7 +44,7 @@ async def reg_grade(message: Message, scb: SCB):
 @bp.on.message(state=RegistrationStates.GRADE_CHECK)
 async def grade_check(message: Message, scb: SCB):
     """Проверка на существование класса."""
-    answer = scb.phrases.wrong_grade
+    answer = scb.phrases.grades.wrong
     keyboard = None
 
     if await scb.grades.is_grade(message.text):
@@ -57,9 +57,9 @@ async def grade_check(message: Message, scb: SCB):
 
 
 @bp.on.message(rules.LevensteinRule("Да", 1), state=RegistrationStates.BROADCAST_STATE)
-async def broadcast_enabled(message: Message, scb):
+async def broadcast_enabled(message: Message, scb: SCB):
     """Если юзер согласился на рассылку."""
-    await message.answer(scb.phrases.broadcast_type, keyboard=BROADCAST_TYPE_KEYBOARD)
+    await message.answer(scb.phrases.broadcast.wrong_format, keyboard=BROADCAST_TYPE_KEYBOARD)
     await bp.state_dispenser.set(message.peer_id, RegistrationStates.BROADCAST_TYPE)
 
 
@@ -70,9 +70,9 @@ async def broadcast_enabled(message: Message, scb):
     ),
     state=RegistrationStates.BROADCAST_TYPE
 )   # PHRASES IN RULES
-async def broadcast_since(message: Message, scb):
+async def broadcast_since(message: Message, scb: SCB):
     """Если юзер согласился на рассылку первого типа."""
-    await message.answer(scb.phrases.broadcast_time_since, keyboard=TIME_SINCE_KEYBOARD)
+    await message.answer(scb.phrases.broadcast.time_since, keyboard=TIME_SINCE_KEYBOARD)
     await bp.state_dispenser.set(message.peer_id, RegistrationStates.BROADCAST_TIME, broadcast_type="since")
 
 
@@ -83,9 +83,9 @@ async def broadcast_since(message: Message, scb):
     ),
     state=RegistrationStates.BROADCAST_TYPE
 )   # PHRASES IN RULES
-async def broadcast_fixed(message: Message, scb):
+async def broadcast_fixed(message: Message, scb: SCB):
     """Если юзер согласился на рассылку второго типа."""
-    await message.answer(scb.phrases.broadcast_time_fixed, keyboard=TIME_FIXED_KEYBOARD)
+    await message.answer(scb.phrases.broadcast.time_fixed, keyboard=TIME_FIXED_KEYBOARD)
     await bp.state_dispenser.set(message.peer_id, RegistrationStates.BROADCAST_TIME, broadcast_type="fixed")
     
     
@@ -104,30 +104,30 @@ async def broadcast_final(message: Message, scb: SCB):
 
         await bp.state_dispenser.set(message.peer_id, RegistrationStates.FINAL_STATE)
     except ValueError:  # неправильный формат времени
-        return scb.phrases.broadcast_wrong_format
+        return scb.phrases.broadcast.wrong_format
 
     await scb.user.register(grade.id)
     await scb.user.set_broadcast(subscriber=True, type=broadcast_type, time=message.text)
-    await message.answer(scb.phrases.registration_passed.render(grade=grade.label, result=msg), keyboard=EMPTY_KEYBOARD)
+    await message.answer(scb.phrases.registration.passed.render(grade=grade.label, result=msg), keyboard=EMPTY_KEYBOARD)
 
 
 @bp.on.message(rules.LevensteinRule("Нет", 3), state=RegistrationStates.BROADCAST_STATE)
-async def broadcast_false(message: Message, scb):
+async def broadcast_false(message: Message, scb: SCB):
     grade = scb.storage.get("grade")
 
     await scb.user.register(grade.id)
-    await message.answer(scb.phrases.registration_passed.render(grade=grade.label, result="нет"), keyboard=EMPTY_KEYBOARD)
+    await message.answer(scb.phrases.registration.passed.render(grade=grade.label, result="нет"), keyboard=EMPTY_KEYBOARD)
     await bp.state_dispenser.set(message.peer_id, RegistrationStates.FINAL_STATE, broadcast=False)
 
 
 @bp.on.message(state=RegistrationStates.BROADCAST_STATE)
-async def broadcast_not_stated(message: Message, scb):
+async def broadcast_not_stated(message: Message, scb: SCB):
     """Заглушка. Если предудыщие хэндлеры не ответили, значит юзер прислал что-то непонятное вместо ответа."""
-    await message.answer(scb.phrases.broadcast_not_stated)
+    await message.answer(scb.phrases.broadcast.not_stated)
 
 
 @bp.on.message(NotRegistered=True)
-async def registration_handler(message: Message, scb):
-    await message.answer(scb.phrases.must_register,
+async def registration_handler(message: Message, scb: SCB):
+    await message.answer(scb.phrases.registration.must_register,
                          keyboard=REGISTER_KEYBOARD)
     await bp.state_dispenser.set(message.peer_id, RegistrationStates.GRADE_STATE)

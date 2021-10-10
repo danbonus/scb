@@ -1,3 +1,8 @@
-from rules import FirstEntry, RegisteredRule, NotRegistered
+from rules import FirstEntry, Registered, NotRegistered, IsWriter
 
-rules = [FirstEntry.FirstEntry, RegisteredRule.RegisteredRule, NotRegistered.NotRegistered]
+rules = [
+    FirstEntry.FirstEntry,
+    Registered.Registered,
+    NotRegistered.NotRegistered,
+    IsWriter.IsWriter
+]

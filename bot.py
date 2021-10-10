@@ -42,7 +42,7 @@ async def setup_blueprints(bot):
         "Registration": None
     }
     at_final = {
-        "Anything": None
+        "Menu": None
     }
 
     for i in load_blueprints_from_package("blueprints"):
