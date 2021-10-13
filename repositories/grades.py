@@ -4,40 +4,28 @@ import re
 from vkbottle import CtxStorage
 from utils.api import Api
 import asyncio
+from repositories.repository import Repository
 
 
-class GradesRepository(AsyncObject):
+class GradesRepository(Repository):
     async def __init__(self, label=None):
-        storage = CtxStorage()
-        self.db = storage.get("db").grades
+        super().__init__("grades")
+        self.label = label
+
         if label:
-            self.record = await self.db.find_one({"label": label})
+            self.record = await self._get_record()
             self.label = label
             self.id = self.record["id"]
             self.homework_db = self.record["homework_db"]
             self.album_id = self.record["album_id"]
-        
-    @classmethod
-    async def is_grade(cls, grade):
-        for i in await cls.get_grades():
-            if i.label.lower() == grade.lower():
-                return True
-        return False
-    
-    @classmethod
-    async def get_grades(cls):
-        result = (await cls()).db.find({})
-        grades = [await cls(i["label"]) async for i in result]
-        return grades
-    
-    @classmethod
-    async def make_grade(cls, label, album_id=None):
+
+    async def create(self, label, album_id=None):
         pattern = re.compile('[\W_]+')
         scrapped_label = pattern.sub('', label).lower()
 
         if not album_id:
             album_id = await Api.create_album(label)
-            
+
         model = {
             "label": label,
             "id": scrapped_label,
@@ -45,13 +33,32 @@ class GradesRepository(AsyncObject):
             "album_id": album_id
         }
 
-        cls().db.insert_one(model)
+        self._db.insert_one(model)
 
-    async def delete_grade(self):
-        await self.db.delete_one({"label": self.label})
+    async def _get_record(self):
+        return await self._db.find_one({"label": self.label})
 
-    async def update_grade(self, keyword, value):
-        await self.db.update_one({"label": self.label}, {"$set": {keyword: value}})
+    @staticmethod
+    async def get(label):
+        return await GradesRepository(label)
+
+    async def update(self, **info):
+        await self._db.update_one({"label": self.label}, {"$set": {info}})
+
+    async def delete(self):
+        await self._db.delete_one({"label": self.label})
+
+    @property  # в виде перемнной будет рекурсия
+    async def list(self):
+        result = self._db.find({})
+        grades = [await GradesRepository(i["label"]) async for i in result]
+        return grades
+
+    async def is_grade(self, grade):
+        for i in await self.list:
+            if i.label.lower() == grade.lower():
+                return True
+        return False
 
     @classmethod
     async def refresh_grades(cls):
@@ -64,10 +71,9 @@ class GradesRepository(AsyncObject):
             new_id = await Api.create_album(grade.label)
             await grade.update_grade("album_id", new_id)
             await asyncio.sleep(1)
-        
+
     async def new_group(self):
         pass
 
     async def get_homework_collection(self):
         pass
-

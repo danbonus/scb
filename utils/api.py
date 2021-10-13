@@ -28,6 +28,17 @@ class Api:
     async def get_group_id(self):
         return (await self.api.groups.get_by_id())[0].id
 
+    @staticmethod
+    @vkscript
+    def cases(uid, cases_):
+        requests = []
+
+        for i in cases_:
+            requests.append(api.users.get(user_ids=uid, name_case=i))  # это не обращение к локальной переменной,
+            # а код для VkExecute. пусть горит красным, вообще похуй
+
+        return requests
+
     @classmethod
     async def get_cases(cls, uid) -> dict:
         cases_dict = {}

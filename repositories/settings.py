@@ -2,12 +2,13 @@ import os
 import argparse
 from distutils.util import strtobool
 
-from logger import logger_debug
+from logger import logger_debug, logger
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
 from vkbottle import CtxStorage
 from configparser import ConfigParser
 from repositories import GradesRepository
+from repositories.repository import Repository
 
 from utils.api import Api
 
@@ -29,7 +30,9 @@ class SettingsRepository:
         self.service_token = self.get("service_token")
         self.init_group_id = self.config.getint(self.section, "init_group_id")
         self.db = self.get("db")
-        self.storage.set("db", self.motor[self.db])
+        self.db = self.motor[self.db]
+        self.storage.set("db", self.db)
+        Repository.db = self.db
 
     def get_settings(self):
         config = ConfigParser()
@@ -53,7 +56,7 @@ class SettingsRepository:
         return result
 
     def set(self, key, value):
-        self.config.set(self.section, key, value)
+        self.config.set(self.section, key, str(value))
 
     async def check_group_id(self, api):
         api = Api(api)

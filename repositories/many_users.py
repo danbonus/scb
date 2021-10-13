@@ -4,6 +4,7 @@ from vkbottle import CtxStorage
 
 
 class ManyUsersRepository:
+    """Interface to work with user collections. Not inheriting the main Repository class"""
     @classmethod
     async def get_admins(cls):
         return await cls.get_many("is_admin", True)

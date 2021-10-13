@@ -12,6 +12,7 @@ from vkbottle.tools.dev_tools import message_min
 from vkbottle.tools.dev_tools.mini_types.bot import MessageMin
 from vkbottle_types.events import GroupEventType
 from vkbottle import ABCDispenseView
+from repositories.requests import RequestsRepository
 
 from utils.args_object import SCB
 
@@ -32,12 +33,12 @@ class ABCMessageView(ABCDispenseView, ABC):
     async def handle_event(
         self, event: dict, ctx_api: "ABCAPI", state_dispenser: "ABCStateDispenser"
     ) -> Any:
-
         # logger.debug("Handling event ({}) with message view".format(event.get("event_id")))
         context_variables = {}
         message = message_min(event, ctx_api)
         message.state_peer = await state_dispenser.cast(self.get_state_key(event))
-        scb = await SCB(message.from_id, message.client_info)
+
+        scb = await SCB(message)
 
         for text_ax in self.default_text_approximators:
             message.text = text_ax(message)

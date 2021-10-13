@@ -1,59 +1,52 @@
-import inspect
-from jinja2 import Template
+from string import Template
 from languages import DefaultLanguage, languages
-
-'''class Language:
-    def __init__(self, lang_name):
-        self.name = lang_name
-        self.phrases = None
-
-    def init(self):
-        self.phrases = [i for i in dir(self) if not i.startswith("_")]
-        for i in ["init", "name", "phrases"]:
-            self.phrases.remove(i)
-        return self.phrases'''
+from utils.my_time import my_time
+from logger import logger
 
 
 class PhrasesRepository(DefaultLanguage):
-    """(message.client_info.button_actions[0].value
+    """
+    (message.client_info.button_actions[0].value
     Короче блять если нужны будут button_actions доделай эту хуйню вот тебе сниппет. Щас я не ебу юзабилити есть или
     нет у этой хуйни
-    TODO: REFACTOR"""
+    ЭТО ПОЛНЫЙ АНАЛ!!!!!!!!!!
+    Пришлось создавать новый класс секций при каждой инициализации репозитория фраз, т.к., как ни странно,
+    при изменении переменной не инстанса класса, а объекта меняется ее значение глобально. А это значит, что
+    все мои темплейты заменяются на отформатированные жинжей2 строки. И следующие юзеры видят в сообщение не свое имя,
+    а имя того, кто первее написал боту. Пиздец! Сила ООП.
+    """
 
-    def __init__(self, name=None, client_info=None):
-        for language in languages:
-            if language().__name__ == name:
-                self._language = language
+    def __init__(self, user, client_info):
+        logger.spam("PHrases rep init")
+        for language in languages:  # итерация по доступным языкам
+            if language().__name__ == user.lang:  # !!! __name__ класса переопределено чтобы скрыть переменную в IDE
+                for section_name in self._attributes(language):  # итерация по атрибутам языка (секциям)
+                    section = getattr(language, section_name)  # объект секции
+                    section = type(section_name, (section,), dict(section.__dict__))  # динамический объект сессии
 
-                for section in self._language:
-                    section_class = getattr(language, section)
-                    self._section = section_class
-                    setattr(self, section, section_class)
+                    setattr(self, section_name, section)  # переопределение объекта секции на динамический
 
-                    for phrase in self._section:
-                        value = getattr(section_class, phrase)
+                    for phrase in self._attributes(section):  # итерация по атрибутам секции (фразам)
+                        value = getattr(section, phrase)  # фраза
 
-                        if type(value) == dict:
-                            priority_interaction_method = list(value.keys())[1]
-                            if getattr(client_info, priority_interaction_method):
+                        if type(value) == dict:  # если у фразы есть несколько вариантов взаимодействия с юзером
+                            priority_interaction_method = list(value.keys())[1]  # второй ключ словаря приориретнее
+
+                            if hasattr(client_info, priority_interaction_method):  # если у юзера есть кнопки, например
                                 value = value[priority_interaction_method]
                             else:
-                                value = value["plain"]
+                                value = value["plain"]  # обычный текст, использование кнопок и тд не предусматривается
 
-                        setattr(section_class, phrase, value)
+                        if type(value) == Template:  # если есть форматирование
+                            if user.last_request.timestamp + 18000 < my_time.now.timestamp():  # нужно ли приветствовать
+                                value = value.safe_substitute(
+                                        greeting=language.__greetings__[my_time.time_of_day()] % user.first_name
+                                    )
+                                if Template.pattern.findall(value):
+                                    value = Template(value)
 
-    @property
-    def _language(self):
-        return [i for i in dir(self.__language) if not i.startswith("_")]
+                        setattr(section, phrase, value)  # присвоение выбранной фразы динамическому объекту секции
 
-    @_language.setter
-    def _language(self, value):
-        self.__language = value
-
-    @property
-    def _section(self):
-        return [i for i in dir(self.__section) if not i.startswith("_")]
-
-    @_section.setter
-    def _section(self, value):
-        self.__section = value
+    @staticmethod
+    def _attributes(obj):
+        return [i for i in dir(obj) if not i.startswith("_")]  # исключение приватных переменных
