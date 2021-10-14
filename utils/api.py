@@ -1,4 +1,5 @@
 from vkbottle.bot import Blueprint
+from vkbottle import API
 from vkbottle import vkscript, CtxStorage
 from logger import logger
 
@@ -19,7 +20,9 @@ def cases(uid, cases_):
 
 
 class Api:
+    user_api: API
     def __init__(self, api=None):
+        self.group_id = CtxStorage().get("group_id")
         self.api = api
         if not api:
             self.api = bp.api
@@ -59,22 +62,26 @@ class Api:
 
     @classmethod
     async def create_album(cls, label):
-        group_id = CtxStorage().get("group_id")
-        albums = await cls().api.photos.get_albums(owner_id=group_id)
+        albums = await cls.user_api.photos.get_albums(owner_id=cls().group_id)
 
         for i in albums.items:
             if label == i.title.split()[-1]:
                 return i.id
 
-        album = await cls().api.photos.create_album(
+        album = await cls.user_api.photos.create_album(
             title="Материалы домашнего задания %s" % label,
             description="Материалы, прилагающиеся к домашним заданиям в %s классе. Кстати, зачем ты сюда заглянул?" % label,
-            group_id=group_id,
+            group_id=cls().group_id,
             upload_by_admins_only=True
         )
 
         return album.id
 
+    @classmethod
+    async def has_album(cls, album_id):
+        albums = await cls.user_api.photos.get_albums(owner_id=cls().group_id, album_ids=[int(album_id)])
+        if albums.items:
+            return True
 
 #async def check_longpoll_settings():
  #   settings = bp.api.groups.get_long_poll_settings()

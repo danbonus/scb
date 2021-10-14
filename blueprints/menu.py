@@ -1,7 +1,7 @@
 from vkbottle_overrides.bot import Blueprint
-from vkbottle.bot import BotLabeler, Message
+from vkbottle.bot import Message
 
-from keyboards import MENU_KEYBOARD
+from constants import MENU_KEYBOARD
 from utils import SCB
 
 

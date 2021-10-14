@@ -12,7 +12,6 @@ from vkbottle_overrides.dispatch.middlewares.abc import BaseMiddleware
 class LogMiddleware(BaseMiddleware):
     async def pre(self, message: MessageMin, scb: SCB):
         await scb.requests.create(message)
-        pass
 
     async def post(
             self,

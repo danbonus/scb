@@ -1,8 +1,9 @@
-from rules import FirstEntry, Registered, NotRegistered, IsWriter
+from rules import FirstEntry, Registered, NotRegistered, IsWriter, IsAdmin
 
 rules = [
     FirstEntry.FirstEntry,
     Registered.Registered,
     NotRegistered.NotRegistered,
-    IsWriter.IsWriter
+    IsWriter.IsWriter,
+    IsAdmin.IsAdmin
 ]

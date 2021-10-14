@@ -42,3 +42,19 @@ MENU_KEYBOARD = (
     .add(Text("ДЗ"))
     .add(Text("Рассылка"))
 )
+
+GRADES_KEYBOARD  = Keyboard(one_time=True, inline=False)
+GRADES_KEYBOARD.add(Text("Создать"), color=KeyboardButtonColor.POSITIVE)
+GRADES_KEYBOARD.add(Text("Удалить"), color=KeyboardButtonColor.NEGATIVE)
+GRADES_KEYBOARD.row()
+GRADES_KEYBOARD.add(Text("Редактировать"), color=KeyboardButtonColor.PRIMARY)
+GRADES_KEYBOARD.row()
+GRADES_KEYBOARD.add(Text("Список классов"), color=KeyboardButtonColor.PRIMARY)
+GRADES_KEYBOARD.row()
+GRADES_KEYBOARD.add(Text("Назад", {"cmd": "back"}), color=KeyboardButtonColor.SECONDARY)
+GRADES_KEYBOARD = GRADES_KEYBOARD.get_json()
+
+
+PASS_KEYBOARD = Keyboard(one_time=True, inline=False)
+PASS_KEYBOARD.add(Text("Пропустить"), color=KeyboardButtonColor.POSITIVE)
+PASS_KEYBOARD = PASS_KEYBOARD.get_json()

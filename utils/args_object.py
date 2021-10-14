@@ -1,4 +1,6 @@
 from repositories import user, phrases, grades, many_users, requests  # CIRCULAR IMPORT ERROR !!!
+from utils.api import Api
+from utils.my_time import MyTime
 from vkbottle import CtxStorage
 from . import AsyncObject
 
@@ -14,6 +16,8 @@ class SCB(AsyncObject):
         self.grades: grades.GradesRepository = await grades.GradesRepository()
         self.many_users: many_users.ManyUsersRepository = many_users.ManyUsersRepository()
         self.requests: requests.RequestsRepository = await requests.RequestsRepository()
+        self.api: Api = Api()
+        self.time = MyTime()
         self.storage.set("SCB", self)
         self.context = {}
         self.rule_toggled = None

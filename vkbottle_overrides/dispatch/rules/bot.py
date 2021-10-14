@@ -77,6 +77,7 @@ class VBMLRule(ABCMessageRule):
         flags: Optional[re.RegexFlag] = None,
     ):
         flags = flags or self.config.get("vbml_flags")
+        flags = re.IGNORECASE  #
 
         if isinstance(pattern, str):
             pattern = [vbml.Pattern(pattern, flags=flags or self.config.get("vbml_flags"))]

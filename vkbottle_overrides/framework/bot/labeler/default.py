@@ -63,6 +63,10 @@ class SCBLabeler(BotLabeler):
         super().__init__(**kwargs)
         self.message_view = MessageView()
         self.custom_rules = kwargs.get("custom_rules") or DEFAULT_CUSTOM_RULES
+        self.rule_config: Dict[str, Any] = {
+            "vbml_flags": re.MULTILINE | re.DOTALL,  # Flags for VBMLRule
+            "vbml_patcher": vbml.Patcher(),  # Patcher for VBMLRule
+        }
 
     def message(
         self, *rules: ShortenRule, blocking: bool = True, **custom_rules

@@ -11,6 +11,7 @@ from repositories import GradesRepository
 from repositories.repository import Repository
 
 from utils.api import Api
+from vkbottle import API
 
 
 class SettingsRepository:
@@ -27,6 +28,7 @@ class SettingsRepository:
         self.config, self.section = self.get_settings()
         self.token = self.get("token")
         self.user_token = self.get("user_token")
+        Api.user_api = API(self.user_token)
         self.service_token = self.get("service_token")
         self.init_group_id = self.config.getint(self.section, "init_group_id")
         self.db = self.get("db")

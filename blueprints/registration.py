@@ -1,10 +1,10 @@
 from datetime import datetime
-from vkbottle_overrides.bot import Message, rules
+from vkbottle_overrides.bot import Message
 
-from keyboards import *
+from constants import *
 from vkbottle_overrides.bot import Blueprint
 from utils import SCB
-from utils import RegistrationStates
+from constants import RegistrationStates
 
 bp = Blueprint()
 bp.name = "Registration"
@@ -16,14 +16,7 @@ async def first_entry_handler(message: Message, scb: SCB):
     await bp.state_dispenser.set(message.peer_id, RegistrationStates.GRADE_STATE)
 
 
-@bp.on.message(
-    (
-            rules.PayloadRule({"reg": "start"}),
-            rules.LevensteinRule("Пройти регистрацию", 3),
-            rules.VBMLRule("1"),
-     ),
-    NotRegistered=True,
-    state=RegistrationStates.GRADE_STATE)
+@bp.on.message(text=["Пройти регистрацию", "1"], NotRegistered=True, state=RegistrationStates.GRADE_STATE)
 async def reg_grade(message: Message, scb: SCB):
     """Начало регистрации, выбор класса."""
     answer = scb.phrases.grades.reg
@@ -55,33 +48,21 @@ async def grade_check(message: Message, scb: SCB):
     await message.answer(answer, keyboard=keyboard)
 
 
-@bp.on.message(rules.LevensteinRule("Да", 1), state=RegistrationStates.BROADCAST_STATE)
+@bp.on.message(text="Да", state=RegistrationStates.BROADCAST_STATE)
 async def broadcast_enabled(message: Message, scb: SCB):
     """Если юзер согласился на рассылку."""
     await message.answer(scb.phrases.broadcast.type, keyboard=BROADCAST_TYPE_KEYBOARD)
     await bp.state_dispenser.set(message.peer_id, RegistrationStates.BROADCAST_TYPE)
 
 
-@bp.on.message(
-    (
-            rules.LevensteinRule("Время с конца последнего урока", 3),
-            rules.VBMLRule("1"),
-    ),
-    state=RegistrationStates.BROADCAST_TYPE
-)   # PHRASES IN RULES
+@bp.on.message(text=["Время с конца последнего урока", "1"], state=RegistrationStates.BROADCAST_TYPE) # PHRASES IN RULES
 async def broadcast_since(message: Message, scb: SCB):
     """Если юзер согласился на рассылку первого типа."""
     await message.answer(scb.phrases.broadcast.time_since, keyboard=TIME_SINCE_KEYBOARD)
     await bp.state_dispenser.set(message.peer_id, RegistrationStates.BROADCAST_TIME, broadcast_type="since")
 
 
-@bp.on.message(
-    (
-            rules.LevensteinRule("Фиксированное время", 3),
-            rules.VBMLRule("2"),
-    ),
-    state=RegistrationStates.BROADCAST_TYPE
-)   # PHRASES IN RULES
+@bp.on.message(text=["Фиксированное время", "2"], state=RegistrationStates.BROADCAST_TYPE)   # PHRASES IN RULES
 async def broadcast_fixed(message: Message, scb: SCB):
     """Если юзер согласился на рассылку второго типа."""
     await message.answer(scb.phrases.broadcast.time_fixed, keyboard=TIME_FIXED_KEYBOARD)
@@ -113,7 +94,7 @@ async def broadcast_final(message: Message, scb: SCB):
     await scb.user.register(grade.id)
 
 
-@bp.on.message(rules.LevensteinRule("Нет", 3), state=RegistrationStates.BROADCAST_STATE)
+@bp.on.message(text=["Нет"], state=RegistrationStates.BROADCAST_STATE)
 async def broadcast_false(message: Message, scb: SCB):
     grade = scb.storage.get("grade")
 

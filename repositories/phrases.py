@@ -44,6 +44,8 @@ class PhrasesRepository(DefaultLanguage):
                                     )
                                 if Template.pattern.findall(value):
                                     value = Template(value)
+                            else:
+                                value = value.safe_substitute(greeting="")
 
                         setattr(section, phrase, value)  # присвоение выбранной фразы динамическому объекту секции
 
