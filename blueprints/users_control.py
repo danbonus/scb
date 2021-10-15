@@ -4,7 +4,7 @@ from vkbottle_overrides.bot import Blueprint
 from vkbottle.bot import BotLabeler, Message
 from repositories.user import UserRepository
 from constants import MENU_KEYBOARD
-from utils import SCB
+from utils.args_object import SCB
 
 
 bp = Blueprint()

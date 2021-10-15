@@ -11,6 +11,8 @@ from vkbottle_overrides.dispatch.middlewares.abc import BaseMiddleware
 
 class LogMiddleware(BaseMiddleware):
     async def pre(self, message: MessageMin, scb: SCB):
+        print()
+        logger.info("Got a message from %s: %s" % (scb.user.full_name, message.text))
         await scb.requests.create(message)
 
     async def post(
@@ -23,4 +25,5 @@ class LogMiddleware(BaseMiddleware):
         if not handlers:
             return
 
-        logger.info(f"Хендлер {handlers[0].handler.__name__} сработал на сообщение.")
+        logger.success(f"Хендлер {handlers[0].handler.__name__} сработал на сообщение.")
+        print()

@@ -1,10 +1,11 @@
 from logger import logger
 from utils.async_object import AsyncObject
 import re
-from vkbottle import CtxStorage
+from vkbottle_overrides.tools import CtxStorage
 from utils.api import Api
 import asyncio
 from repositories.repository import Repository
+from transliterate import translit
 
 
 class GradesRepository(Repository):
@@ -19,9 +20,10 @@ class GradesRepository(Repository):
             self.homework_db = self.record["homework_db"]
             self.album_id = self.record["album_id"]
 
-    async def create(self, label, album_id=None):
+    async def create(self, label, album_id, bells, subjects, schedule):
         pattern = re.compile('[\W_]+')
         scrapped_label = pattern.sub('', label).lower()
+        scrapped_label = translit(scrapped_label, "ru", reversed=True)
 
         if not album_id:
             album_id = await Api.create_album(label)
@@ -30,7 +32,10 @@ class GradesRepository(Repository):
             "label": label,
             "id": scrapped_label,
             "homework_db": f"homework_{scrapped_label}",
-            "album_id": album_id
+            "album_id": album_id,
+            "bells": bells,
+            "subjects": subjects,
+            "schedule": schedule
         }
 
         self._db.insert_one(model)

@@ -1,6 +1,7 @@
 from vkbottle.bot import Blueprint
 from vkbottle import API
-from vkbottle import vkscript, CtxStorage
+from vkbottle_overrides.tools import CtxStorage
+from vkbottle import vkscript
 from logger import logger
 
 bp = Blueprint()
@@ -79,9 +80,10 @@ class Api:
 
     @classmethod
     async def has_album(cls, album_id):
-        albums = await cls.user_api.photos.get_albums(owner_id=cls().group_id, album_ids=[int(album_id)])
+        albums = await cls.user_api.photos.get_albums(owner_id=-cls().group_id, album_ids=[int(album_id)])
+
         if albums.items:
-            return True
+            return albums.items[0]
 
 #async def check_longpoll_settings():
  #   settings = bp.api.groups.get_long_poll_settings()

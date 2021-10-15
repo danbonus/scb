@@ -1,7 +1,8 @@
 from repositories import user, phrases, grades, many_users, requests  # CIRCULAR IMPORT ERROR !!!
 from utils.api import Api
 from utils.my_time import MyTime
-from vkbottle import CtxStorage
+from vkbottle_overrides.tools import CtxStorage as ctx1
+from vkbottle_overrides.tools import CtxStorage
 from . import AsyncObject
 
 

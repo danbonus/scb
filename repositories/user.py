@@ -1,4 +1,4 @@
-from vkbottle import CtxStorage
+from vkbottle_overrides.tools import CtxStorage
 from models.user import user
 from logger import logger
 from utils.async_object import AsyncObject
@@ -9,7 +9,7 @@ from repositories.repository import Repository
 
 class UserRepository(Repository):
     async def __init__(self, uid: int, case="nom", on_event=False):
-        logger.spam("User Repository init")
+        #logger.spam("User Repository init")
         super().__init__("users")
         self.uid = uid
         self.new = False

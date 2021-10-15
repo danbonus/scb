@@ -1,15 +1,14 @@
-import os
 import argparse
 
 from logger import logger
-from vkbottle import CtxStorage
+from vkbottle_overrides.tools import CtxStorage
 
 from repositories import SettingsRepository
 from bot import init_bot
 
 
 if __name__ == '__main__':
-    storage = CtxStorage(default={"user_token": os.environ.get("user_token")})
+    storage = CtxStorage()
 
     parser = argparse.ArgumentParser(description='SCB')
 

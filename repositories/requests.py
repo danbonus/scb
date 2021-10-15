@@ -58,5 +58,5 @@ class RequestsRepository(Repository):
             last_request = {
                 "request_id": 0
             }
-        logger.debug(last_request)
+        #logger.debug(last_request)
         return await RequestsRepository(last_request["request_id"])

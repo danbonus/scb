@@ -17,7 +17,9 @@ class PhrasesRepository(DefaultLanguage):
     """
 
     def __init__(self, user, client_info):
-        logger.spam("PHrases rep init")
+        #logger.spam("PHrases rep init")
+        self.languages = [i().__name__ for i in languages]
+
         for language in languages:  # итерация по доступным языкам
             if language().__name__ == user.lang:  # !!! __name__ класса переопределено чтобы скрыть переменную в IDE
                 for section_name in self._attributes(language):  # итерация по атрибутам языка (секциям)
@@ -29,7 +31,7 @@ class PhrasesRepository(DefaultLanguage):
                     for phrase in self._attributes(section):  # итерация по атрибутам секции (фразам)
                         value = getattr(section, phrase)  # фраза
 
-                        if type(value) == dict:  # если у фразы есть несколько вариантов взаимодействия с юзером
+                        if type(value) == dict and section_name != "constants":  # если у фразы есть несколько вариантов взаимодействия с юзером
                             priority_interaction_method = list(value.keys())[1]  # второй ключ словаря приориретнее
 
                             if hasattr(client_info, priority_interaction_method):  # если у юзера есть кнопки, например
@@ -37,15 +39,21 @@ class PhrasesRepository(DefaultLanguage):
                             else:
                                 value = value["plain"]  # обычный текст, использование кнопок и тд не предусматривается
 
+                        if section == "constants":
+                            pass
+
                         if type(value) == Template:  # если есть форматирование
-                            if user.last_request.timestamp + 18000 < my_time.now.timestamp():  # нужно ли приветствовать
-                                value = value.safe_substitute(
-                                        greeting=language.__greetings__[my_time.time_of_day()] % user.first_name
-                                    )
-                                if Template.pattern.findall(value):
-                                    value = Template(value)
-                            else:
-                                value = value.safe_substitute(greeting="")
+                            args = Template.pattern.findall(value.safe_substitute())
+
+                            if 'greeting' in [i[1] for i in args]:
+
+                                if user.last_request.timestamp + 18000 < my_time.now.timestamp():  # нужно ли приветствовать
+                                    value = value.safe_substitute(
+                                            greeting=language.__greetings__[my_time.time_of_day()] % user.first_name
+                                        )
+
+                                else:
+                                    value = value.safe_substitute(greeting="")
 
                         setattr(section, phrase, value)  # присвоение выбранной фразы динамическому объекту секции
 

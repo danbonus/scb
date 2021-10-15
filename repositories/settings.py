@@ -5,7 +5,7 @@ from distutils.util import strtobool
 from logger import logger_debug, logger
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
-from vkbottle import CtxStorage
+from vkbottle_overrides.tools import CtxStorage
 from configparser import ConfigParser
 from repositories import GradesRepository
 from repositories.repository import Repository

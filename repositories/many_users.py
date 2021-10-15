@@ -1,6 +1,6 @@
 from .user import UserRepository
 from logger import logger
-from vkbottle import CtxStorage
+from vkbottle_overrides.tools import CtxStorage
 
 
 class ManyUsersRepository:

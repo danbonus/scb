@@ -1,7 +1,7 @@
 from logger import logger
 from utils.async_object import AsyncObject
 import re
-from vkbottle import CtxStorage
+from vkbottle_overrides.tools import CtxStorage
 from utils.api import Api
 import asyncio
 from repositories.repository import Repository

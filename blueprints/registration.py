@@ -3,7 +3,7 @@ from vkbottle_overrides.bot import Message
 
 from constants import *
 from vkbottle_overrides.bot import Blueprint
-from utils import SCB
+from utils.args_object import SCB
 from constants import RegistrationStates
 
 bp = Blueprint()
@@ -89,7 +89,7 @@ async def broadcast_final(message: Message, scb: SCB):
     await scb.user.set_broadcast(subscriber=True, type=broadcast_type, time=message.text)
     await message.answer(
         scb.phrases.registration.passed.substitute(grade=grade.label, result=msg),
-        keyboard=EMPTY_KEYBOARD
+        keyboard=MENU_KEYBOARD
     )
     await scb.user.register(grade.id)
 
@@ -100,7 +100,7 @@ async def broadcast_false(message: Message, scb: SCB):
 
     await message.answer(
         scb.phrases.registration.passed.substitute(grade=grade.label, result="нет"),
-        keyboard=EMPTY_KEYBOARD
+        keyboard=MENU_KEYBOARD
     )
     await bp.state_dispenser.set(message.peer_id, RegistrationStates.FINAL_STATE, broadcast=False)
     await scb.user.register(grade.id)

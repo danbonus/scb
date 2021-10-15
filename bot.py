@@ -5,7 +5,7 @@ from rules import rules
 from utils.api import bp, Api
 from vkbottle.bot import Bot
 from vkbottle_overrides.tools.dev_tools.utils import load_blueprints_from_package
-from vkbottle import CtxStorage
+from vkbottle_overrides.tools import CtxStorage
 from vkbottle_overrides.bot import SCBLabeler
 import argparse
 
@@ -39,7 +39,8 @@ async def setup_blueprints(bot):
     handlers_count = 0
     blueprints = {}
     at_start = {
-        "Registration": None
+        "Registration": None,
+        "Back Handler": None
     }
     at_final = {
         "Menu": None
@@ -77,6 +78,7 @@ async def setup_middlewares(bot):
 
     for i in middlewares:
         bot.labeler.message_view.register_middleware(i)
+        logger.debug(f"Loading middleware: %s." % i)
         middlewares_count += 1
 
     logger.info(f"Middlewares loaded: {middlewares_count}.")
@@ -96,4 +98,3 @@ async def setup_rules(bot):
 async def setup_api(bot):
     storage = CtxStorage()
     storage.set("api", bot.api)
-    storage.set("group_id", await Api(bot.api).get_group_id())
