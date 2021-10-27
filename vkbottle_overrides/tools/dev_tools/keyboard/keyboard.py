@@ -13,3 +13,9 @@ class Keyboard(RootKeyboard):
         button = KeyboardButton.from_typed(action, color)
         self.buttons[-1].append(button)
         return self
+
+    def __add__(self, other_keyboard: RootKeyboard):
+        temp_keyboard = Keyboard(one_time=self.one_time, inline=self.inline)
+        temp_keyboard.buttons.extend(self.buttons)
+        temp_keyboard.buttons.extend(other_keyboard.buttons)
+        return temp_keyboard

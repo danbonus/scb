@@ -1,10 +1,10 @@
-from vkbottle.bot import Blueprint
+#from vkbottle_overrides.bot import Blueprint
 from vkbottle import API
 from vkbottle_overrides.tools import CtxStorage
 from vkbottle import vkscript
 from logger import logger
 
-bp = Blueprint()
+#bp = Blueprint()
 
 # костыль для простого доступа к апи у сторонних модулей
 
@@ -21,12 +21,14 @@ def cases(uid, cases_):
 
 
 class Api:
+    api: API
     user_api: API
+    group_id: int
+
     def __init__(self, api=None):
-        self.group_id = CtxStorage().get("group_id")
-        self.api = api
-        if not api:
-            self.api = bp.api
+        #self.group_id = CtxStorage().get("group_id")
+        if api:
+            self.api = api
         #self.group_id = self.get_group_id()
 
     async def get_group_id(self):
@@ -49,7 +51,7 @@ class Api:
         cases_list = ["nom", 'gen', 'dat', 'acc', 'ins', 'abl']
 
         code = cases(uid=uid, cases_=cases_list)
-        result = (await bp.api.execute(code=code))["response"][::-1]
+        result = (await cls.api.execute(code=code))["response"][::-1]
 
         for index, i in enumerate(result):
             i = i[0]

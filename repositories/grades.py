@@ -1,7 +1,5 @@
 from logger import logger
-from utils.async_object import AsyncObject
 import re
-from vkbottle_overrides.tools import CtxStorage
 from utils.api import Api
 import asyncio
 from repositories.repository import Repository
@@ -9,7 +7,7 @@ from transliterate import translit
 
 
 class GradesRepository(Repository):
-    async def __init__(self, label=None):
+    async def __init__(self, label=None, subjects=None):
         super().__init__("grades")
         self.label = label
 
@@ -19,6 +17,9 @@ class GradesRepository(Repository):
             self.id = self.record["id"]
             self.homework_db = self.record["homework_db"]
             self.album_id = self.record["album_id"]
+            self.bells = self.record["bells"]
+            self.subjects = self.record["subjects"]
+            self.schedule = self.record["schedule"]
 
     async def create(self, label, album_id, bells, subjects, schedule):
         pattern = re.compile('[\W_]+')

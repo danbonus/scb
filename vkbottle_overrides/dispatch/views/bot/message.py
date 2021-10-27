@@ -13,6 +13,7 @@ from vkbottle.tools.dev_tools.mini_types.bot import MessageMin
 from vkbottle_types.events import GroupEventType
 from vkbottle import ABCDispenseView
 from repositories.requests import RequestsRepository
+from collections import defaultdict
 
 from utils.args_object import SCB
 
@@ -23,6 +24,7 @@ class ABCMessageView(ABCDispenseView, ABC):
     def __init__(self):
         self.state_source_key = DEFAULT_STATE_KEY
         self.handlers: List["ABCHandler"] = []
+        self.states = {}
         self.middlewares: List["BaseMiddleware"] = []
         self.default_text_approximators: List[Callable[[MessageMin], str]] = []
         self.handler_return_manager = BotMessageReturnHandler()
@@ -35,10 +37,11 @@ class ABCMessageView(ABCDispenseView, ABC):
     ) -> Any:
         # logger.debug("Handling event ({}) with message view".format(event.get("event_id")))
         context_variables = {}
+
         message = message_min(event, ctx_api)
         message.state_peer = await state_dispenser.cast(self.get_state_key(event))
 
-        scb = await SCB(message)
+        scb = await SCB(message, {"event": event, "handlers": self.handlers, "states": self.states})
 
         for text_ax in self.default_text_approximators:
             message.text = text_ax(message)
@@ -55,7 +58,7 @@ class ABCMessageView(ABCDispenseView, ABC):
 
         for handler in self.handlers:
             result = await handler.filter(message, scb)
-            # logger.debug("Handler {} returned {}".format(handler, result))
+            logger.spam("Handler {} returned {}".format(handler, result))
 
             if result is False:
                 continue
@@ -77,9 +80,10 @@ class ABCMessageView(ABCDispenseView, ABC):
 
             if handler.blocking:
                 break
+            message.state_peer = await state_dispenser.cast(self.get_state_key(event))
 
         for middleware in self.middlewares:
-            await middleware.post(message, self, handle_responses, handlers)
+            await middleware.post(message, self, handle_responses, handlers, scb)
 
 
 class MessageView(ABCMessageView):

@@ -41,19 +41,19 @@ class PhrasesRepository(DefaultLanguage):
 
                         if section == "constants":
                             pass
-
                         if type(value) == Template:  # если есть форматирование
                             args = Template.pattern.findall(value.safe_substitute())
 
                             if 'greeting' in [i[1] for i in args]:
-
                                 if user.last_request.timestamp + 18000 < my_time.now.timestamp():  # нужно ли приветствовать
                                     value = value.safe_substitute(
                                             greeting=language.__greetings__[my_time.time_of_day()] % user.first_name
-                                        )
+                                        )  # STRING
 
                                 else:
-                                    value = value.safe_substitute(greeting="")
+                                    value = value.safe_substitute(greeting="")  # STRING
+
+                                value = Template(value)  # TEMPLATE
 
                         setattr(section, phrase, value)  # присвоение выбранной фразы динамическому объекту секции
 

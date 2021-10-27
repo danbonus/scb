@@ -5,7 +5,7 @@ import sys
 
 
 def logger_debug():
-    logger.setLevel(verboselogs.SPAM)
+    logger.setLevel(logging.DEBUG)
 
 
 logger = verboselogs.VerboseLogger('scb')

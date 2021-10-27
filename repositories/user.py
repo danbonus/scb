@@ -1,8 +1,5 @@
-from vkbottle_overrides.tools import CtxStorage
 from models.user import user
 from logger import logger
-from utils.async_object import AsyncObject
-from motor.core import Collection
 from repositories.requests import RequestsRepository
 from repositories.repository import Repository
 
@@ -35,8 +32,6 @@ class UserRepository(Repository):
         self.full_name = self.record["name_cases"][case]["full_name"]
 
         self.last_request = await RequestsRepository.get_last_request(uid=self.uid)
-        if on_event:
-            self
 
     async def create(self):
         record = await user(uid=self.uid)

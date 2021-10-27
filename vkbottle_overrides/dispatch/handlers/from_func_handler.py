@@ -20,7 +20,9 @@ class FromFuncHandler(ABCHandler):
         rules_passed = []
 
         for rule in self.rules:
+            #print(rule)
             result = await rule.check(event, scb)
+            #print(result)
             if result is False or result is None:
                 return False
             elif result is True:

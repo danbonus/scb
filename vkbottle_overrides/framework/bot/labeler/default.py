@@ -1,13 +1,17 @@
 from typing import Set, Tuple, Union
 import re
+from logger import logger
 from typing import Any, Callable, Dict, List, Set, Tuple, Type, Union
 from vkbottle.bot import BotLabeler
 from vkbottle_overrides.dispatch.rules.abc import ABCRule
 from vkbottle_overrides.tools.dev_tools.utils import convert_shorten_filter
-from vkbottle_overrides.dispatch.views.bot import MessageView
+from vkbottle_overrides.dispatch.views.bot import MessageView, RawEventView
 from vkbottle_overrides.dispatch.handlers.from_func_handler import FromFuncHandler
-from vkbottle.framework.bot.labeler.abc import LabeledMessageHandler
+from vkbottle_overrides.dispatch.views import HandlerBasement, MessageView, RawEventView
 import vbml
+from .abc import ABCBotLabeler, LabeledHandler, LabeledMessageHandler, EventName
+from vkbottle_types.events import GroupEventType
+
 
 from vkbottle_overrides.dispatch.rules.bot import (
     AttachmentTypeRule,
@@ -62,6 +66,7 @@ class SCBLabeler(BotLabeler):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.message_view = MessageView()
+        self.raw_event_view = RawEventView()
         self.custom_rules = kwargs.get("custom_rules") or DEFAULT_CUSTOM_RULES
         self.rule_config: Dict[str, Any] = {
             "vbml_flags": re.MULTILINE | re.DOTALL,  # Flags for VBMLRule
@@ -81,6 +86,62 @@ class SCBLabeler(BotLabeler):
                     blocking=blocking,
                 )
             )
+            #print(custom_rules)
+            if not func.__name__.startswith("back"):
+                if 'state' in custom_rules:
+                    if custom_rules['state'] in self.message_view.states:
+                        self.message_view.states[custom_rules['state']].append(func.__name__)
+                    else:
+                        self.message_view.states[custom_rules['state']] = [func.__name__]
+                else:
+                    self.message_view.states["NO_STATE"] = [func.__name__]
+
             return func
 
         return decorator
+
+
+    def raw_event(
+        self,
+        event: Union[EventName, List[EventName]],
+        dataclass: Callable = dict,
+        *rules: ShortenRule,
+        **custom_rules,
+    ) -> LabeledHandler:
+
+        if not isinstance(event, list):
+            event = [event]
+
+        def decorator(func):
+            for e in event:
+
+                if isinstance(e, str):
+                    e = GroupEventType(e)
+
+                self.raw_event_view.handlers[e] = HandlerBasement(
+                    dataclass,
+                    FromFuncHandler(
+                        func,
+                        *map(convert_shorten_filter, rules),
+                        *self.auto_rules,
+                        *self.get_custom_rules(custom_rules),
+                    ),
+                )
+            return func
+
+        return decorator
+
+
+
+    def load(self, labeler: "SCBLabeler"):
+        self.message_view.handlers.extend(labeler.message_view.handlers)
+
+        for state, handlers in labeler.message_view.states.items():
+            if state in self.message_view.states:
+                self.message_view.states[state].extend(handlers)
+            else:
+                self.message_view.states[state] = handlers
+
+        self.message_view.middlewares.extend(labeler.message_view.middlewares)
+        self.raw_event_view.handlers.update(labeler.raw_event_view.handlers)
+        self.raw_event_view.middlewares.extend(labeler.raw_event_view.middlewares)

@@ -1,10 +1,7 @@
-import os
-import argparse
 from distutils.util import strtobool
 
 from logger import logger_debug, logger
 from motor.motor_asyncio import AsyncIOMotorClient
-from dotenv import load_dotenv
 from vkbottle_overrides.tools import CtxStorage
 from configparser import ConfigParser
 from repositories import GradesRepository
@@ -63,7 +60,7 @@ class SettingsRepository:
     async def check_group_id(self, api):
         api = Api(api)
         group_id = await api.get_group_id()
-        self.storage.set("group_id", group_id)
+        Api.group_id = group_id
 
         if self.init_group_id:
             if group_id != self.init_group_id:

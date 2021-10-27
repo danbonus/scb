@@ -1,4 +1,4 @@
-from languages.default import DefaultLanguage
+from languages.russian.russian import DefaultLanguage
 
 
 languages = [DefaultLanguage]

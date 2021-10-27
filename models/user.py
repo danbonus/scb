@@ -5,7 +5,7 @@ async def user(uid):
     user_model = {
         "uid": uid,
         "grade": None,
-        "lang": "normal",
+        "lang": "russian",
         "roles":
             {
                 "writer": False,

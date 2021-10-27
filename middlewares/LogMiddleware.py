@@ -13,7 +13,6 @@ class LogMiddleware(BaseMiddleware):
     async def pre(self, message: MessageMin, scb: SCB):
         print()
         logger.info("Got a message from %s: %s" % (scb.user.full_name, message.text))
-        await scb.requests.create(message)
 
     async def post(
             self,
@@ -21,9 +20,12 @@ class LogMiddleware(BaseMiddleware):
             view: "ABCView",
             handle_responses: List[Any],
             handlers: List["FromFuncHandler"],
+            scb: SCB
     ):
         if not handlers:
             return
 
-        logger.success(f"Хендлер {handlers[0].handler.__name__} сработал на сообщение.")
+        handler_names = [i.handler.__name__ for i in handlers]
+        logger.success(f"Хендлеры {', '.join(handler_names)} сработали на сообщение.")
+        await scb.requests.update(handler=handler_names[-1])
         print()

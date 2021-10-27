@@ -14,7 +14,7 @@ from vkbottle_types.events import GroupEventType
 from vkbottle.dispatch.views import ABCView
 from vkbottle import ABCDispenseView
 from vkbottle import GroupTypes
-from utils.args_object import SCB
+from utils.raw_args_object import SCB
 
 HandlerBasement = NamedTuple("HandlerBasement", [("dataclass", Callable), ("handler", ABCHandler)])
 
@@ -38,6 +38,7 @@ class RawEventView(ABCView):
         context_variables = {}
 
         event_model = handler_basement.dataclass(**event)
+        scb = await SCB(event_model, {"event": event, "handlers": self.handlers})
 
         if isinstance(event_model, dict):
             event_model["ctx_api"] = ctx_api
@@ -51,7 +52,7 @@ class RawEventView(ABCView):
             elif isinstance(response, dict):
                 context_variables.update(response)
 
-        result = await handler_basement.handler.filter(event_model)
+        result = await handler_basement.handler.filter(event_model, scb)
         logger.debug("Handler {} returned {}".format(handler_basement.handler, result))
 
         if result is False:
@@ -60,7 +61,7 @@ class RawEventView(ABCView):
         elif isinstance(result, dict):
             context_variables.update(result)
 
-        handler_response = await handler_basement.handler.handle(event_model, **context_variables)
+        handler_response = await handler_basement.handler.handle(event_model, scb, **context_variables)
 
         return_handler = self.handler_return_manager.get_handler(handler_response)
         if return_handler is not None:
