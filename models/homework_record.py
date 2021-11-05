@@ -8,8 +8,8 @@ class HomeworkRecord:
         self.gdz = self.record["gdz"]
         self.timestamp = self.record["timestamp"]
         self.sender = self.record["sender"]
+
         if self.homework_id:
             self.filled = True
         else:
             self.filled = False
-

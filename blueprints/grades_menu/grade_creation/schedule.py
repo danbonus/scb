@@ -42,7 +42,7 @@ async def end(message: Message, scb: SCB):
             msg += "%s. [%s] %s\n" % (lesson_number, lesson["room"], scb.subjects[lesson["subject"]].nomn)
         msg += "\n\n"
 
-    await scb.grades.create(
+    (await scb.grades).create(
         label=scb.storage["label"],
         album_id=scb.storage["album_id"],
         bells=scb.storage["bells"],

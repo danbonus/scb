@@ -1,12 +1,12 @@
 from repositories.repository import Repository
 from repositories.grades import GradesRepository
 from repositories.subjects import SubjectsRepository
-from utils.my_time import MyTime
+from repositories.time import TimeRepository
 from models.schedule_element import ScheduleElement
 
 
 class ScheduleRepository(Repository):
-    async def __init__(self, grades: GradesRepository, subjects: SubjectsRepository, time: MyTime):
+    async def __init__(self, grades: GradesRepository, subjects: SubjectsRepository, time: TimeRepository):
         super().__init__("schedule")
         self.grades = grades
         self.subjects = subjects
@@ -22,15 +22,18 @@ class ScheduleRepository(Repository):
             7: ["15:05", "15:50"]
         }
         self.schedule = grades.schedule
-        this_day, tomorrow_day = time.check_for_weekday()
-        today_schedule = self.schedule[str(this_day.weekday())]
-        tomorrow_schedule = self.schedule[str(tomorrow_day.weekday())]
-        start_ts, end_ts = time.start_end(this_day)
+        this_day, tomorrow_day = time.get_days_of_school()
+        start_ts, end_ts = time.get_day_time_borders(this_day)
 
-        print(today_schedule)
+        self.schedule = {}
+        for day, day_schedule in grades.schedule.items():
+            self.schedule[day] = []
+            for bell, element in day_schedule.items():
+                self.schedule[day].append(ScheduleElement(subjects, element))
 
-        self.today = [ScheduleElement(subjects, value) for key, value in today_schedule.items()]
-        self.tomorrow = [ScheduleElement(subjects, value) for key, value in tomorrow_schedule.items()]
+        #self.today = self.schedule[str(this_day.weekday())]
+        #self.tomorrow = self.schedule[str(tomorrow_day.weekday())]
+
 
     '''async def create(self, **info ):
         model = {

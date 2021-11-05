@@ -48,7 +48,7 @@ class RequestsRepository(Repository):
                 "handler": "not handled yet",
                 "return_command": False,
                 "event": event,
-                "state": message.state_peer.state if message.state_peer else message.state_peer
+                "state": message.state_peer.state if message.state_peer else 0
             }
         )
         return request_id
@@ -76,7 +76,7 @@ class RequestsRepository(Repository):
                 "request_id": 0
             }
         #logger.debug(last_request)
-        logger.info(last_record["request_id"])
+        #logger.info(last_record["request_id"])
         last_request: RequestsRepository = await RequestsRepository(request_id=last_record["request_id"])
         return last_request
 
@@ -96,15 +96,15 @@ class RequestsRepository(Repository):
         last_request: RequestsRepository = await RequestsRepository(last_record["request_id"])
         return last_request
 
-    async def get_last_requests_by_count(self, num_skip, num):
-        records = await self._db.find({"uid": self.uid, "return_command": False}, sort=[("timestamp", -1)]).skip(num_skip).to_list(num)
+    async def get_last_requests_by_count(self, handler, num_skip, num):
+        record = await self._db.find_one({"uid": self.uid, "handler": handler, "return_command": False}, sort=[("timestamp", -1)])
         #logger.error("Getting Records: %s" % records)
         # logger.debug(last_request)
         #requests: List[RequestsRepository] = [await RequestsRepository(record["request_id"]) for record in records]
-        return records
+        return record
 
-    async def get_stateless_requests_by_count(self, num_skip, num):
-        records = await self._db.find({"uid": self.uid, "return_command": False, "state": None}, sort=[("timestamp", -1)]).skip(num_skip).to_list(num)
+    async def get_stateless_requests_by_count(self, handler, num_skip, num):
+        records = await self._db.find({"uid": self.uid, "return_command": False, "handler": handler, "state": 0}, sort=[("timestamp", -1)]).skip(num_skip).to_list(num)
         # logger.debug(last_request)
         #requests: List[RequestsRepository] = [await RequestsRepository(record["request_id"]) for record in records]
         return records

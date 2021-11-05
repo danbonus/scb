@@ -4,6 +4,7 @@
 # accs = винительный (вижу кого, что?)
 # ablt = творительный (доволен кем, чем?)
 # loct = предложный (думаю о чём, ком?)
+from dataclasses import dataclass
 
 
 class Subject:
@@ -20,6 +21,17 @@ class Subject:
 
     emoji: str
 
+    lang_group: int = 0
+    ege_group: int = 0
+
+'''
+class GroupSubject(Subject):
+    teacher_name: str
+    group: int'''
+
+''' 
+class ElectiveSubject(Subject):
+    elective: bool'''
 
 # математические:
 #   матеша, алгебра,
@@ -77,8 +89,24 @@ class Geometry(Subject):
     emoji = "📐"
 
 
+class GeometryEl(Geometry, Subject):
+    label = "geometry-el"
+
+    nomn = "Геометрия (эл.)"
+    gent = "геометрии (эл.)"
+    datv = "геометрии (эл.)"
+    accs = "геометрию (эл.)"
+    ablt = "геометрией (эл.)"
+    loct = "геометрии (эл.)"
+
+    shorts = [
+        "геометрия эл", "геом эл", "геометр эл",
+        "geometry el", "geom el", "geometr el"
+    ]
+
+
 class IT(Subject):
-    label = "it"
+    label = "compsci"
 
     nomn = "Информатика"
     gent = "информатики"
@@ -93,6 +121,30 @@ class IT(Subject):
     ]
     emoji = "🖥"
 
+
+class IT_PD(IT, Subject):
+    label = "compsci1"
+
+    name = " П. Д"
+
+    shorts = [
+        "Информатика 1", "инф 1", "инфа 1",
+        "инфо 1", "info 1", "infa 1", "it 1"
+    ]
+
+    lang_group = 1
+
+
+class IT_ON(IT, Subject):
+    label = "compsci2"
+
+    name = " О. Н"
+
+    shorts = [
+        "Информатика 2", "инф 2", "инфа 2",
+        "инфо 2", "info 2", "infa 2", "it 2"
+    ]
+    lang_group = 2
 
 ####################
 
@@ -200,6 +252,38 @@ class Biology(Subject):
     emoji = "🧬"
 
 
+class BiologyEl(Biology, Subject):
+    label = "biology-el"
+
+    nomn = "Биология (эл.)"
+    gent = "биологии (эл.)"
+    datv = "биологии (эл.)"
+    accs = "биологию (эл.)"
+    ablt = "биологией (эл.)"
+    loct = "биологии (эл.)"
+
+    shorts = [
+        "биология", "био", "биолог",
+        "беу", "беулогия", "biology",
+        "bio", "beu", "beulogia",
+        "biologia", "biolog"
+    ]
+
+
+class BiologyEGE(BiologyEl, Subject):
+    label = "biology-el1"
+    name = " ЕГЭ"
+    # nomn = Biology.nomn + teacher_name
+    ege_group = 1
+
+
+class BiologyNonEGE(BiologyEl, Subject):
+    label = "biology-el2"
+    name = " неЕГЭ"
+    # nomn = Biology.nomn + teacher_name
+    ege_group = 2
+
+
 class Physics(Subject):
     label = "physics"
 
@@ -233,6 +317,29 @@ class Chemistry(Subject):
         "chemistry", "chem"
     ]
     emoji = "🧪"
+
+
+class ChemistryEl(Chemistry, Subject):
+    label = "chemistry-el"
+
+    nomn = "Химия (эл.)"
+    gent = "химии (эл.)"
+    datv = "химии (эл.)"
+    accs = "химию (эл.)"
+    ablt = "химией (эл.)"
+    loct = "химии (эл.)"
+
+
+class ChemistryEGE(ChemistryEl, Subject):
+    label = "chemistry-el1"
+    name = " (ЕГЭ)"
+    ege_group = 1
+
+
+class ChemistryNonEGE(ChemistryEl, Subject):
+    label = "chemistry-el2"
+    name = " (неЕГЭ)"
+    ege_group = 2
 
 
 class LifeSafetyFundamentals(Subject):
@@ -489,6 +596,18 @@ class English(Subject):
     emoji = "🇬🇧"
 
 
+class EnglishPD(English, Subject):
+    label = "english1"
+    name = " П. Д"
+    lang_group = 1
+
+
+class EnglishON(English, Subject):
+    label = "english2"
+    name = " О. Н"
+    lang_group = 2
+
+
 '''class French(Subject):
     label = "french"
 
@@ -670,3 +789,4 @@ class IndividualProject(Subject):
 
 class DefaultSubjects:
     default = [i for i in Subject.__subclasses__()]
+    print(default)

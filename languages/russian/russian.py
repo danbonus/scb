@@ -34,6 +34,8 @@ class Constants:
         "6": "Воскресенье"
     }
 
+    homework_string = "{0} | {1}. [{2}] {3}: {4}\n"
+
 
 class DefaultLanguage:
     __name__ = "russian"

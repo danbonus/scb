@@ -5,6 +5,7 @@ from typing import Any, NoReturn, Optional, Union
 from vkbottle.api import ABCAPI, API
 from vkbottle.dispatch import ABCRouter, ABCStateDispenser
 from vkbottle.polling import ABCPolling
+from vkbottle import LoopWrapper
 
 from .abc import ABCFramework
 
@@ -23,7 +24,7 @@ class ABCBlueprint(ABCFramework):
 
     @abstractmethod
     def construct(
-        self, api: ABCAPI, polling: ABCPolling, state_dispenser: ABCStateDispenser
+        self, api: ABCAPI, polling: ABCPolling, state_dispenser: ABCStateDispenser, loop_wrapper: LoopWrapper, handlers
     ) -> "ABCBlueprint":
         pass
 

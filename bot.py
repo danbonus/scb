@@ -1,22 +1,26 @@
-from vkbottle.tools.dev_tools.loop_wrapper import LoopWrapper
+from vkbottle_overrides.tools.dev_tools.loop_wrapper import LoopWrapper
 from logger import logger
 from middlewares import middlewares
 from rules import rules
 from utils.api import Api
-from vkbottle.bot import Bot
+from vkbottle_overrides.bot import Bot
 from vkbottle_overrides.tools.dev_tools.utils import load_blueprints_from_package
 from vkbottle_overrides.tools import CtxStorage
 from vkbottle_overrides.bot import SCBLabeler
 import argparse
+from vkbottle_overrides.dispatch.dispenser import BuiltinStateDispenser
+from utils.broadcast import broadcast
+from middlewares.OutdatedEventMiddleware import OutdatedEventMiddleware
+from middlewares.EventAnswerMiddleware import EventAnswerMiddleware
 
 
-def init_bot(token):
+def init_bot(token) -> Bot:
     logger.success("SCB time! Starting.")
     lw = LoopWrapper()
     bot = Bot(token=token, loop_wrapper=lw)
+    bot.state_dispenser = BuiltinStateDispenser()
     bot.labeler = SCBLabeler()
     bot.labeler.vbml_ignore_case = True  # беу == БЕУ == бЕу
-
     lw.on_startup.extend(
         [
             setup_api(bot),
@@ -25,8 +29,13 @@ def init_bot(token):
             setup_middlewares(bot)
         ]
     )
+    lw.create_interval(broadcast, seconds=40)
 
     return bot
+
+
+async def beu():
+    print("сработало")
 
 
 async def setup_blueprints(bot):
@@ -39,7 +48,9 @@ async def setup_blueprints(bot):
     blueprints = {}
     at_start = {
         "First Entry": None,
-        "Back Handler": None
+        "Back Handler": None,
+        "HW ADD: attachments": None,
+        "HW ADD: text": None
     }
     at_final = {
         "Registration": None,
@@ -75,6 +86,9 @@ async def setup_blueprints(bot):
 
 async def setup_middlewares(bot):
     middlewares_count = 0
+
+    bot.labeler.message_event_view.register_middleware(OutdatedEventMiddleware())
+    bot.labeler.message_event_view.register_middleware(EventAnswerMiddleware())
 
     for i in middlewares:
         bot.labeler.message_view.register_middleware(i)

@@ -30,7 +30,6 @@ class SubjectsRepository(Repository):
         is_russian = re.compile(r'[а-яА-ЯёЁ]')
 
         if is_russian.match(name):
-            print(name)
             morph = pymorphy2.MorphAnalyzer()
             subject = morph.parse(label)
             cases["nomn"] = subject[0].inflect({"nomn"}).word.capitalize().strip()
@@ -73,10 +72,11 @@ class SubjectsRepository(Repository):
     def grades_subjects(self):
         grade_subjects = []
 
+        logger.debug(self.list_)
         for i in self.list_:
             if i.label in self.grades.subjects:
                 grade_subjects.append(i)
-
+        logger.debug(grade_subjects)
         return grade_subjects
 
     async def list_func(self):
@@ -84,7 +84,7 @@ class SubjectsRepository(Repository):
         subjects_list.extend(self.phrases.subjects.default)
         subjects_from_db = await self.get()
         subjects_list.extend(subjects_from_db)
-        logger.warning(subjects_from_db)
+        #logger.warning(subjects_from_db)
         return subjects_list
 
     def dict(self):  # доступ по лейблу из колбасок
@@ -93,14 +93,25 @@ class SubjectsRepository(Repository):
             subjects[subject.label] = subject
         return subjects
 
+    async def is_subject(self, message):
+        for i in self.list_:
+            if await LevensteinRule(i.shorts).check(message):
+                return i
+
+    async def find_groups(self, subject):
+        logger.debug(subject)
+        if subject[-1].isdigit():
+            subject = subject[:-1]
+        logger.debug(subject)
+        print([i.label for i in self.list_ if subject in i.label])
+        groups = len([i.label for i in self.list_ if i.label.startswith(subject)]) - 1
+        logger.debug(groups)
+        return [self.dict[subject + str(i+1)] for i in range(groups)]
+
     def __contains__(self, item):
         if item in self.list_:
             return True
 
     def __getitem__(self, key):
         return self.dict[key]
-# strip, lower и прочее в репозиториях
-    async def is_subject(self, message):
-        for i in self.list_:
-            if await LevensteinRule(i.shorts).check(message):
-                return i
+    # strip, lower и прочее в репозиториях

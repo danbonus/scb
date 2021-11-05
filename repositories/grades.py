@@ -4,6 +4,7 @@ from utils.api import Api
 import asyncio
 from repositories.repository import Repository
 from transliterate import translit
+from models.bell import Bell
 
 
 class GradesRepository(Repository):
@@ -17,7 +18,7 @@ class GradesRepository(Repository):
             self.id = self.record["id"]
             self.homework_db = self.record["homework_db"]
             self.album_id = self.record["album_id"]
-            self.bells = self.record["bells"]
+            self.bells = {bell_num: Bell(data) for bell_num, data in self.record["bells"].items()}
             self.subjects = self.record["subjects"]
             self.schedule = self.record["schedule"]
 

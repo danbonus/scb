@@ -9,27 +9,12 @@ from constants import RegistrationStates
 bp = Blueprint()
 bp.name = "Registration. Broadcast"
 
-
+'''
 @bp.on.message(text="Да", state=RegistrationStates.BROADCAST_STATE)
 async def broadcast_enabled(message: Message, scb: SCB):
     """Если юзер согласился на рассылку."""
     await message.answer(scb.phrases.broadcast.type, keyboard=BROADCAST_TYPE_KEYBOARD)
     await bp.state_dispenser.set(message.peer_id, RegistrationStates.BROADCAST_TYPE)
-
-
-@bp.on.message(text=["Время с конца последнего урока", "1"],
-               state=RegistrationStates.BROADCAST_TYPE)  # PHRASES IN RULES
-async def broadcast_since(message: Message, scb: SCB):
-    """Если юзер согласился на рассылку первого типа."""
-    await message.answer(scb.phrases.broadcast.time_since, keyboard=TIME_SINCE_KEYBOARD)
-    await bp.state_dispenser.set(message.peer_id, RegistrationStates.BROADCAST_TIME, broadcast_type="since")
-
-
-@bp.on.message(text=["Фиксированное время", "2"], state=RegistrationStates.BROADCAST_TYPE)  # PHRASES IN RULES
-async def broadcast_fixed(message: Message, scb: SCB):
-    """Если юзер согласился на рассылку второго типа."""
-    await message.answer(scb.phrases.broadcast.time_fixed, keyboard=TIME_FIXED_KEYBOARD)
-    await bp.state_dispenser.set(message.peer_id, RegistrationStates.BROADCAST_TIME, broadcast_type="fixed")
 
 
 @bp.on.message(state=RegistrationStates.BROADCAST_TIME)
@@ -73,3 +58,4 @@ async def broadcast_false(message: Message, scb: SCB):
 async def broadcast_not_stated(message: Message, scb: SCB):
     """Заглушка. Если предудыщие хэндлеры не ответили, значит юзер прислал что-то непонятное вместо ответа."""
     await message.answer(scb.phrases.broadcast.not_stated)
+'''''

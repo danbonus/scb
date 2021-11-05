@@ -1,6 +1,7 @@
 from .user import UserRepository
 from logger import logger
 from vkbottle_overrides.tools import CtxStorage
+from typing import List
 
 
 class ManyUsersRepository:
@@ -18,7 +19,11 @@ class ManyUsersRepository:
         return await cls.get_many("is_writer", True)
 
     @classmethod
-    async def get_many(cls, keyword, value):
+    async def get_broadcast_subscribers(cls):
+        return await cls.get_many("broadcast_user", True)
+
+    @classmethod
+    async def get_many(cls, keyword, value) -> List[UserRepository]:
         db = CtxStorage().get("db")
         users = []
         result = db.users.find({keyword: value})

@@ -6,5 +6,5 @@ class IsWriter(rules.ABCMessageRule):
         pass
 
     async def check(self, message: Message, scb: SCB) -> bool:
-        if scb.user.is_writer:
+        if scb.user.is_writer or scb.user.is_admin:
             return True

@@ -6,12 +6,18 @@ from vkbottle.tools.dev_tools.vkscript_converter import vkscript
 from .dispatch import (
     ABCFilter,
     ABCHandler,
+    ABCRouter,
     ABCRule,
+    ABCStateDispenser,
+    ABCView,
+    ABCDispenseView,
     ABCMessageView,
     MessageView,
     RawEventView,
     AndFilter,
     BaseMiddleware,
+    BotRouter,
+    BuiltinStateDispenser,
     MiddlewareResponse,
     OrFilter,
 )
@@ -19,5 +25,7 @@ from .dispatch import (
 from .framework import BotBlueprint
 
 from .tools import *
+
+from .framework import ABCBlueprint, ABCFramework, Bot, BotBlueprint
 
 event_types = GroupTypes

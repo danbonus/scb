@@ -1,5 +1,13 @@
-from repositories import user, phrases, grades, many_users, subjects  # CIRCULAR IMPORT ERROR !!!
-from models import subject
+from repositories import (
+    user,
+    phrases,
+    grades,
+    many_users,
+    requests,
+    subjects,
+    schedule,
+    homework
+) # CIRCULAR IMPORT ERROR !!!from models import subject
 from utils.api import Api
 from utils.my_time import MyTime
 from vkbottle_overrides.tools import CtxStorage
@@ -21,10 +29,14 @@ class SCB(AsyncObject):
         self.subjects: subjects.SubjectsRepository = await subjects.SubjectsRepository(
             self.phrases, self.grades, self.user
         )
-        self.single_subject = subject.SingleSubject
+        self.time = MyTime()
+        if self.user.registered:
+            self.schedule: schedule.ScheduleRepository = await schedule.ScheduleRepository(self.grades, self.subjects,
+                                                                                           self.time)
+            self.homework: homework.HomeworkRepository = await homework.HomeworkRepository(self.schedule, self.time,
+                                                                                           self.grades.homework_db)
         self.many_users: many_users.ManyUsersRepository = many_users.ManyUsersRepository()
         self.api: Api = Api()
-        self.time = MyTime()
 
         self.storage.set("SCB", self)
         self.rule_toggled = None

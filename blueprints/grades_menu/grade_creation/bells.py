@@ -42,7 +42,6 @@ async def bells_input(message: Message, scb: SCB):
     scb.storage["subjects_chosen"] = []
     scb.storage["schedule"] = {}
     scb.storage["subjects"] = []
-    print("I have caught bells!")
     await bp.state_dispenser.set(message.peer_id, GradeCreationStates.SCHEDULE)
     #print(await bp.state_dispenser.get(message.peer_id))
     await message.answer(scb.phrases.grade_creation.schedule % scb.phrases.constants.days["0"].lower())

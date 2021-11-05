@@ -32,8 +32,8 @@ class FromFuncHandler(ABCHandler):
 
         return rule_context
 
-    async def handle(self, event: Any, scb) -> Any:
-        return await self.handler(event, scb)
+    async def handle(self, event: Any, scb, **context) -> Any:
+        return await self.handler(event, scb, **context)
 
     def __repr__(self):
         return f"<FromFuncHandler {self.handler.__name__} blocking={self.blocking} rules={self.rules}>"

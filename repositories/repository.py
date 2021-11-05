@@ -23,7 +23,7 @@ class Repository(AsyncObject):
     async def update(self, **info):
         ...
 
-    async def delete(self):
+    async def delete(self, uid):
         ...
 
     @property

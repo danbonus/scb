@@ -1,2 +1,3 @@
 from .blueprint import BotBlueprint
-from .labeler import SCBLabeler
+from .bot import Bot
+from .labeler import ABCBotLabeler, SCBLabeler

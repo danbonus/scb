@@ -7,6 +7,10 @@ from repositories import SettingsRepository
 from bot import init_bot
 
 
+async def beu():
+    print("сработало")
+
+
 if __name__ == '__main__':
     storage = CtxStorage()
 

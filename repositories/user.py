@@ -13,12 +13,14 @@ class UserRepository(Repository):
         self.record = await self._get_record()
 
         self.grade = self.record["grade"]
+        self.lang_group = self.record["lang_group"]
+        self.ege_group = self.record["ege_group"]
         self.registered = self.grade
 
         self.lang = self.record["lang"]
 
         self.broadcast_info = self.record["broadcast_info"]
-        self.is_broadcast_subscriber = self.broadcast_info["subscriber"]
+        self.is_broadcast_subscriber = self.record["broadcast_user"]
         self.broadcast_type = self.broadcast_info["type"]
         self.broadcast_time = self.broadcast_info["time"]
 
@@ -43,6 +45,7 @@ class UserRepository(Repository):
         record = await self._db.find_one({"uid": self.uid})
 
         if not record:
+            print(self.uid)
             logger.debug("New user! Creating a record.")
             self.new = True
             record = await self.create()
@@ -50,8 +53,8 @@ class UserRepository(Repository):
         return record
 
     @staticmethod
-    async def get(uid):
-        return await UserRepository(uid)
+    async def get(uid, case=None) -> "UserRepository":
+        return await UserRepository(uid, case)
 
     async def update(self, **info):
         await self._db.update_one({"uid": self.uid}, {"$set": info})
@@ -63,4 +66,4 @@ class UserRepository(Repository):
         await self.update(grade=grade, registered=True)
 
     async def set_broadcast(self, **broadcast_info):
-        await self.update(broadcast_info=broadcast_info)
+        await self.update(broadcast_user=True, broadcast_info=broadcast_info)

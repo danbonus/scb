@@ -14,7 +14,7 @@ from vkbottle_types.events import GroupEventType
 from vkbottle.dispatch.views import ABCView
 from vkbottle import ABCDispenseView
 from vkbottle import GroupTypes
-from utils.raw_args_object import SCB
+from utils.args_object import SCB
 
 HandlerBasement = NamedTuple("HandlerBasement", [("dataclass", Callable), ("handler", ABCHandler)])
 

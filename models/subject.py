@@ -13,3 +13,6 @@ class SingleSubject:
 
         self.shorts = raw_subject["shorts"]
         self.emoji = raw_subject["emoji"]
+
+        self.lang_group = raw_subject["lang_group"]
+        self.ege_group = raw_subject["ege_group"]

@@ -13,10 +13,11 @@ from constants.keyboards import Keyboard, Text, KeyboardButtonColor, Callback
 
 
 class Pagination:
-    def __init__(self, list_, size, payload):
+    def __init__(self, list_, size, payload, inline):
         self.list = list_
         self.size = size
         self.payload = payload
+        self.inline = inline
 
     def get(self):
         chunks = list(self.chunks(self.list, self.size))
@@ -26,7 +27,7 @@ class Pagination:
         list_page = chunks[0]
         pages_count = len(chunks)
         NEXT_KEYBOARD = (
-            Keyboard(one_time=False, inline=False)
+            Keyboard(one_time=False, inline=self.inline)
                 .row()
                 .add(Callback(f"1 / {pages_count}", payload={"easter": "беу)"}))
                 .add(Callback("➡", payload={"page": 2}))
@@ -44,7 +45,7 @@ class Pagination:
 
                 elif chunks[-1] == list_page:
                     PREVIOUS_KEYBOARD = (
-                        Keyboard(one_time=False, inline=False)
+                        Keyboard(one_time=False, inline=self.inline)
                             .row()
                             .add(Callback("⬅", payload={"page": visible_page - 1}))
                             .add(Callback(f"{pages_count} / {pages_count}", payload={"easter": "беу)"}))
@@ -54,7 +55,7 @@ class Pagination:
 
                 else:
                     BOTH_KEYBOARD = (
-                        Keyboard(one_time=False, inline=False)
+                        Keyboard(one_time=False, inline=self.inline)
                             .row()
                             .add(Callback("⬅", payload={"page": visible_page - 1}))
                             .add(Callback(f"{visible_page} / {pages_count}", payload={"easter": "беу)"}))
@@ -62,6 +63,9 @@ class Pagination:
                     )
 
                     keyboard = BOTH_KEYBOARD
+            else:
+                if len(chunks) > 1:
+                    keyboard = NEXT_KEYBOARD
 
         else:  # без нажатия кнопок -> <-
             if len(chunks) > 1:

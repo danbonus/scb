@@ -3,7 +3,7 @@ from vkbottle_overrides.bot import Message
 from constants import *
 from vkbottle_overrides.bot import Blueprint
 from utils.args_object import SCB
-from constants import RegistrationStates
+from constants import RegistrationStates, BroadcastStates
 
 bp = Blueprint()
 bp.name = "Registration. Choose grade"
@@ -29,13 +29,15 @@ async def reg_start(message: Message, scb: SCB):
 @bp.on.message(state=RegistrationStates.GRADE_CHECK)
 async def grade_check(message: Message, scb: SCB):
     """Проверка на существование класса."""
-    answer = scb.phrases.registration.wrong_grade
-    keyboard = None
 
     if await scb.grades.is_grade(message.text):
-        answer = scb.phrases.broadcast.broadcast % message.text
+        answer = "ок класс создан вся хуйня теперь и рассылочку можно\n\n"
+        answer += scb.phrases.broadcast.broadcast % message.text
         keyboard = YN_KEYBOARD
-        scb.storage.set("grade", await scb.grades.get(message.text))
-        await bp.state_dispenser.set(message.peer_id, RegistrationStates.BROADCAST_STATE)
+        scb.storage.set("grade", (grade := await scb.grades.get(message.text)))
+        await bp.state_dispenser.set(message.peer_id, BroadcastStates.ENABLE_BROADCAST)
+        await scb.user.register(grade.label)
+    else:
+        return scb.phrases.registration.wrong_grade
 
     await message.answer(answer, keyboard=keyboard)

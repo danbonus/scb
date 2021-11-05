@@ -2,11 +2,22 @@ from datetime import datetime, time, timedelta
 
 
 class MyTime:
-    def __init__(self):
+    def __init__(self, scb):
         self.night = "night"
         self.morning = "morning"
         self.afternoon = "afternoon"
         self.evening = "evening"
+        self.scb = scb
+
+    def get_today(self):
+        if 'emulation_date' in self.scb.storage:
+            return datetime.strptime(self.scb.storage["emulation_date"], "%d.%m.%Y").replace(hour=16)
+        else:
+            return datetime.today()
+
+    def get_timestamp(self):
+        today = self.get_today()
+        return int(today.timestamp())
 
     def time_of_day(self, in_time=None):
         time = datetime.now()
@@ -37,22 +48,30 @@ class MyTime:
     def check_for_weekday(self):
         weekday = self.get_weekday()
         hour = datetime.now().hour
-        this_day = datetime.date(datetime.today())
-        tomorrow_day = datetime.date(datetime.today() + timedelta(days=1))
+        today = self.get_today()
 
-        if weekday == 0:  # Понедельник
-            this_day = datetime.date(datetime.today() - timedelta(days=2))
-        elif weekday == 5:  # Суббота
-            tomorrow_day = datetime.date(datetime.today() + timedelta(days=2))
-        elif weekday == 6:
-            this_day = datetime.date(datetime.today() - timedelta(days=1))
-            return this_day, tomorrow_day
+        day_before_yesterday = datetime.date(today - timedelta(days=2))
+        yesterday = datetime.date(today - timedelta(days=1))
 
-        if hour < 8:
-            this_day = datetime.date(datetime.today() - timedelta(days=1))
-            tomorrow_day = datetime.date(datetime.today())
+        last_day = datetime.date(today)  # today
 
-        return this_day, tomorrow_day
+        next_day = datetime.date(today + timedelta(days=1))  # tomorrow
+        day_after_tomorrow = datetime.date(today + timedelta(days=2))
+
+        if weekday == 5:  # Суббота
+            next_day = day_after_tomorrow
+        elif weekday == 6:  # Воскресенье
+            return yesterday, next_day  # не учимся, следующая проверка не нужна
+
+        if hour < 8:  # если учебный день еще не начался
+            if weekday == 0:  # если сейчас понедельник, то предыдущий учебный день -- позавчера, суббота
+                next_day = last_day  # след. день -- понедельник
+                last_day = day_before_yesterday
+            else:
+                last_day = yesterday
+                next_day = last_day
+
+        return last_day, next_day
 
     def str_to_timestamp(self, date=''):
         time1 = None
@@ -69,14 +88,14 @@ class MyTime:
         return timestamp, int(time1.timestamp()) + 83699 if time1 else int(timestamp) + 83699
 
     def check(self, timestamp):  # Check if given timestamp date == today date
-        midnight = datetime.combine(datetime.today(), time.min)
+        midnight = datetime.combine(self.get_today(), time.min)
         start = int(midnight.timestamp())
         end = start + 83699
         if start < timestamp < end:
             return True
 
     def start_end(self, date=None):
-        midnight = datetime.combine(datetime.today() if not date else date, time.min)
+        midnight = datetime.combine(self.get_today() if not date else date, time.min)
         start = int(midnight.timestamp())
         end = start + 111600
         return start, end
@@ -88,4 +107,3 @@ class MyTime:
     def hm_format(self, message):
         datetime.strptime(message, '%H:%M')
 
-my_time = MyTime()

@@ -1,6 +1,5 @@
 from string import Template
 from languages import DefaultLanguage, languages
-from utils.my_time import my_time
 from logger import logger
 
 
@@ -16,7 +15,7 @@ class PhrasesRepository(DefaultLanguage):
     а имя того, кто первее написал боту. Пиздец! Сила ООП.
     """
 
-    def __init__(self, user, client_info):
+    def __init__(self, user, client_info, time):
         #logger.spam("PHrases rep init")
         self.languages = [i().__name__ for i in languages]
 
@@ -45,9 +44,9 @@ class PhrasesRepository(DefaultLanguage):
                             args = Template.pattern.findall(value.safe_substitute())
 
                             if 'greeting' in [i[1] for i in args]:
-                                if user.last_request.timestamp + 18000 < my_time.now.timestamp():  # нужно ли приветствовать
+                                if user.last_request.timestamp + 18000 < time.now().timestamp():  # нужно ли приветствовать
                                     value = value.safe_substitute(
-                                            greeting=language.__greetings__[my_time.time_of_day()] % user.first_name
+                                            greeting=language.__greetings__[time.time_of_day()] % user.first_name
                                         )  # STRING
 
                                 else:

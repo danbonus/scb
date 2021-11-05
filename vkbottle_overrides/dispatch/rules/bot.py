@@ -254,7 +254,12 @@ class PayloadRule(ABCMessageRule):
         self.payload = payload
 
     async def check(self, message: Message, scb) -> bool:
-        return message.get_payload_json() in self.payload
+        if isinstance(message, Message):
+            payload = message.get_payload_json(unpack_failure=lambda p: {})
+        else:
+            import json
+            payload = json.loads(json.dumps(message.object.payload))
+        return payload in self.payload
 
 
 class PayloadContainsRule(ABCMessageRule):
@@ -316,7 +321,15 @@ class PayloadMapRule(ABCMessageRule):
         return True
 
     async def check(self, message: Message, scb) -> bool:
-        payload = message.get_payload_json(unpack_failure=lambda p: {})
+        print(message)
+        print(dir(message))
+        if isinstance(message, Message):
+            payload = message.get_payload_json(unpack_failure=lambda p: {})
+        else:
+            import json
+            payload = json.loads(json.dumps(message.object.payload))
+           # payload = message.object.get_payload_json(unpack_failure=lambda p: {})
+
         return await self.match(payload, self.payload_map)
 
 
