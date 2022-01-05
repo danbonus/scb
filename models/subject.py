@@ -15,4 +15,6 @@ class SingleSubject:
         self.emoji = raw_subject["emoji"]
 
         self.lang_group = raw_subject["lang_group"]
-        self.ege_group = raw_subject["ege_group"]
+        self.exam_group = raw_subject["exam_group"]
+
+        self.name: str

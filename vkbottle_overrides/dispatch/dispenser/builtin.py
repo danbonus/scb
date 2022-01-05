@@ -1,12 +1,10 @@
+import itertools
 from typing import Dict, Union, Optional
 
+from logger import logger
 from models.state import BaseStateGroup, StatePeer
-
 from .abc import ABCStateDispenser
 
-import itertools
-
-from logger import logger
 
 class BuiltinStateDispenser(ABCStateDispenser):
     def __init__(self):

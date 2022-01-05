@@ -1,12 +1,14 @@
-from logger import logger
-from vkbottle_overrides.dispatch.rules.bot import LevensteinRule
-from repositories.repository import Repository
-from repositories.grades import GradesRepository
-from repositories.user import UserRepository
-from models.subject import SingleSubject
-import re
 import pymorphy2
+import re
 from transliterate import translit
+
+from logger import logger
+from models.subject import SingleSubject
+from repositories.grades import GradesRepository
+from repositories.repository import Repository
+from repositories.user import UserRepository
+from vkbottle_overrides.dispatch.rules.bot import LevensteinRule
+
 
 class SubjectsRepository(Repository):
     async def __init__(self, phrases, grades: GradesRepository, user: UserRepository):
@@ -99,14 +101,23 @@ class SubjectsRepository(Repository):
                 return i
 
     async def find_groups(self, subject):
+        groups = self.grades.lang_groups
+        groups.extend(self.grades.exam_groups)
         logger.debug(subject)
         if subject[-1].isdigit():
             subject = subject[:-1]
+
+        for group in groups:
+            subjects_count = len(group.subjects)
+            for group_subject in group.subjects:
+                if subject == group_subject[:-1]:
+                    return [self.dict[subject + str(i+1)] for i in range(subjects_count)]
+
         logger.debug(subject)
-        print([i.label for i in self.list_ if subject in i.label])
-        groups = len([i.label for i in self.list_ if i.label.startswith(subject)]) - 1
+        #print([i.label for i in self.list_ if subject in i.label])
+        #groups = len([i.label for i in self.list_ if i.label.startswith(subject)]) - 1
         logger.debug(groups)
-        return [self.dict[subject + str(i+1)] for i in range(groups)]
+        #return [self.dict[subject + str(i+1)] for i in range(groups)]
 
     def __contains__(self, item):
         if item in self.list_:

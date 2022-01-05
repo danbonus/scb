@@ -1,7 +1,5 @@
-from asyncio import AbstractEventLoop
 from abc import ABC, abstractmethod
 from typing import Callable, Dict, Type
-
 from vkbottle.api.abc import ABCAPI
 from vkbottle.exception_factory.error_handler import ABCErrorHandler
 

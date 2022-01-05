@@ -1,11 +1,8 @@
-from vkbottle_overrides.bot import Blueprint
-from utils.args_object import SCB
-#from constants.states import GradeCreationStatesList, GradeCreationStates
-from vkbottle_overrides.bot import Message
-from vkbottle.tools.dev_tools import message_min
 from logger import logger
-import itertools
-from asyncio import sleep
+from utils.args_object import SCB
+from vkbottle_overrides.bot import Blueprint
+# from constants.states import GradeCreationStatesList, GradeCreationStates
+from vkbottle_overrides.bot import Message
 
 bp = Blueprint()
 bp.name = "Back Handler"
@@ -13,7 +10,7 @@ bp.name = "Back Handler"
 """ГОВНОДИЩЕ ! ПРОСТО ПИЗДЕЦ ! НЕ СМОТРЕТЬ"""
 
 
-@bp.on.message(text=["Вернуться", "Back", "Бэк"])
+'''@bp.on.private_message(text=["Вернуться", "Back", "Бэк"])
 async def back_handler(message: Message, scb: SCB):
     await scb.requests.update(return_command=True)
 
@@ -51,4 +48,4 @@ async def back_handler(message: Message, scb: SCB):
     logger.info("Back-handling: %s" % handler_name)
     await bp.state_dispenser.set_tree(message.peer_id, handler, previous_message)
     await handler.handle(previous_message, scb)
-    return
+    return'''''

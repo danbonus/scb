@@ -1,10 +1,9 @@
 from typing import Any, List, Optional, Union
-
-from models.state import StatePeer
+from vkbottle.api import ABCAPI, API
 from vkbottle_types.events.bot_events import MessageNew
 from vkbottle_types.objects import ClientInfoForBots, MessagesMessage, UsersUser
 
-from vkbottle.api import ABCAPI, API
+from models.state import StatePeer
 
 
 class MessageMin(MessagesMessage):

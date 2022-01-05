@@ -1,5 +1,7 @@
 from datetime import datetime, date, timedelta, time
 
+from logger import logger
+
 
 class TimeRepository:
     def __init__(self, storage):
@@ -15,9 +17,9 @@ class TimeRepository:
     def get_today(self, custom_date=None):
         day = datetime.today()
         if 'emulation_date' in self.storage:
-            day = datetime.strptime(self.storage["emulation_date"], "%d.%m.%Y").replace(hour=11)
+            day = self.storage["emulation_date"]
         if custom_date:
-            day = custom_date
+            day = custom_date.replace(hour=11)
         return day
 
     def get_tomorrow(self, custom_date=None):
@@ -41,26 +43,31 @@ class TimeRepository:
 
     def get_weekday(self, custom_date=None):
         if custom_date:
-            #weekday = datetime.strptime(custom_date, "%d.%m.%y")
-            weekday = custom_date
+            day = custom_date
         else:
-            weekday = self.get_today()
-        return weekday.weekday()
+            day = self.get_today()
+        return day.weekday()
+
+    def get_date_from_timestamp(self, timestamp):
+        return datetime.fromtimestamp(timestamp)
 
     def get_days_of_school(self, custom_date=None):
         weekday = self.get_weekday(custom_date)
-        print("День недели: %s" % weekday)
+        #print("День недели: %s" % weekday)
         today = self.get_today(custom_date)
-        print("Today: %s" % today.date())
+        #print("Today: %s" % today.date())
         hour = today.hour
+        #print("Hour: %s" % hour)
 
-        day_before_yesterday = datetime.date(today - timedelta(days=2))
-        yesterday = datetime.date(today - timedelta(days=1))
-        print("Yesterday: %s" % yesterday)
-        last_day = datetime.date(today)  # today
+        today = datetime.combine(self.get_today(custom_date), time.min)
 
-        next_day = datetime.date(today + timedelta(days=1))  # tomorrow
-        day_after_tomorrow = datetime.date(today + timedelta(days=2))
+        day_before_yesterday = today - timedelta(days=2)
+        yesterday = today - timedelta(days=1)
+        #print("Yesterday: %s" % yesterday)
+        last_day = today  # today
+
+        next_day = today + timedelta(days=1)  # tomorrow
+        day_after_tomorrow = today + timedelta(days=2)
 
         if weekday == 5:  # Суббота
             next_day = day_after_tomorrow
@@ -68,6 +75,7 @@ class TimeRepository:
             return yesterday, next_day  # не учимся, следующая проверка не нужна
 
         if hour < 8:  # если учебный день еще не начался
+            logger.debug('день не начался')
             if weekday == 0:  # если сейчас понедельник, то предыдущий учебный день -- позавчера, суббота
                 next_day = last_day  # след. день -- понедельник
                 last_day = day_before_yesterday
@@ -75,8 +83,6 @@ class TimeRepository:
                 next_day = last_day
                 last_day = yesterday
 
-        print(last_day)
-        print(next_day)
         return last_day, next_day
 
     def is_today(self, timestamp):
@@ -90,15 +96,18 @@ class TimeRepository:
         end = start + 111600
         return start, end
 
-    def time_of_day(self, in_time=None):
+    def get_start_timestamp(self, timestamp):
+        return int(datetime.combine(datetime.fromtimestamp(timestamp), time.min).timestamp())
+
+    def time_of_day(self, custom_time=None):
         now = datetime.now()
 
-        if not in_time:
+        if not custom_time:
             hour = now.hour
         else:
-            hour = in_time.hour
+            hour = custom_time.hour
 
-        if hour < 5:
+        if hour < 5 or hour == 23:
             return self.night
         elif hour < 11:
             return self.morning
@@ -106,8 +115,6 @@ class TimeRepository:
             return self.afternoon
         elif hour < 23:
             return self.evening
-        elif hour == 23:
-            return self.night
 
     def str_to_timestamp(self, date=''):
         time1 = None
@@ -122,6 +129,10 @@ class TimeRepository:
             return False
         timestamp = int(time.timestamp())
         return timestamp, int(time1.timestamp()) + 83699 if time1 else int(timestamp) + 83699
+
+    def timestamp_from_date(self, string_date):
+        date_object = datetime.strptime(string_date, "%d.%m.%Y")
+        return date_object.timestamp()
 
     @staticmethod
     def now():

@@ -1,8 +1,10 @@
-from vkbottle import MiddlewareResponse
-from vkbottle_overrides.dispatch.middlewares.abc import BaseMiddleware
-from vkbottle import GroupTypes
 import json
+
+from vkbottle import GroupTypes
+from vkbottle import MiddlewareResponse
+
 from logger import logger
+from vkbottle_overrides.dispatch.middlewares.abc import BaseMiddleware
 
 
 class OutdatedEventMiddleware(BaseMiddleware):

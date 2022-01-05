@@ -1,12 +1,8 @@
-from typing import Callable
-from logger import logger
-
-from abc import ABC, abstractmethod
 from typing import Any, Union
+from typing import Callable
+
 from vkbottle_overrides.dispatch.rules.abc import ABCRule
 from .abc import ABCHandler
-import inspect
-import os
 
 
 class FromFuncHandler(ABCHandler):
@@ -28,6 +24,9 @@ class FromFuncHandler(ABCHandler):
             elif result is True:
                 rules_passed.append(rule)
                 continue
+            #print(result
+             #     )
+            #print(rule)
             rule_context.update(result)
 
         return rule_context

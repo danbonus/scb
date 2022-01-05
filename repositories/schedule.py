@@ -1,8 +1,10 @@
-from repositories.repository import Repository
+from typing import List
+
+from models.schedule_element import ScheduleElement
 from repositories.grades import GradesRepository
+from repositories.repository import Repository
 from repositories.subjects import SubjectsRepository
 from repositories.time import TimeRepository
-from models.schedule_element import ScheduleElement
 
 
 class ScheduleRepository(Repository):
@@ -64,11 +66,5 @@ class ScheduleRepository(Repository):
     async def list(self):
         return
 
-    def dict(self):  # доступ по лейблу из колбасок
-        subjects = {}
-        for subject in self.list_:
-            subjects[subject.label] = subject
-        return subjects
-
-    def __getitem__(self, key):
-        return self.dict[key]
+    def __getitem__(self, key) -> List[ScheduleElement]:
+        return self.schedule[key]

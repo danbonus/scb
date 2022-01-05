@@ -1,8 +1,8 @@
-from vkbottle_overrides.bot import Blueprint
-from utils.args_object import SCB
 from constants.states import GradeCreationStates
-from vkbottle_overrides.bot import Message
 from rules import IsMessageNotEmpty
+from utils.args_object import SCB
+from vkbottle_overrides.bot import Blueprint
+from vkbottle_overrides.bot import Message
 
 bp = Blueprint()
 bp.name = "Grade Schedule"
@@ -11,7 +11,7 @@ bp.name = "Grade Schedule"
 bp.labeler.auto_rules = [IsMessageNotEmpty.IsMessageNotEmpty()]
 
 
-@bp.on.message(state=GradeCreationStates.SCHEDULE)
+@bp.on.private_message(state=GradeCreationStates.SCHEDULE)
 async def schedule(message: Message, scb: SCB):
     try:
         schedule_dict = await get_schedule(message.text, scb)
@@ -28,7 +28,7 @@ async def schedule(message: Message, scb: SCB):
     await message.answer(scb.phrases.grade_creation.schedule_iter % scb.phrases.constants.days_acc[str(records_count)].lower())
 
 
-@bp.on.message(state=GradeCreationStates.END)
+@bp.on.private_message(state=GradeCreationStates.END)
 async def end(message: Message, scb: SCB):
 
     schedule_dict = await get_schedule(message.text, scb)

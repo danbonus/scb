@@ -1,23 +1,12 @@
 from vkbottle_overrides.bot import Blueprint
-from vkbottle_overrides.bot import Message
-from utils.args_object import SCB
-from constants.keyboards import FIRST_BELL, RETURN_KEYBOARD, PASS_KEYBOARD
-from constants.states import GradeCreationStates
+
+#from constants.keyboards import FIRST_BELL, RETURN_KEYBOARD, PASS_KEYBOARD
 
 bp = Blueprint()
 bp.name = "Reload Modules"
 
-from vkbottle.tools.dev_tools.loop_wrapper import LoopWrapper
 from logger import logger
-from middlewares import middlewares
-from rules import rules
-from utils.api import Api
-from vkbottle.bot import Bot
 from vkbottle_overrides.tools.dev_tools.utils import load_blueprints_from_package
-from vkbottle_overrides.tools import CtxStorage
-from vkbottle_overrides.bot import SCBLabeler
-import argparse
-
 
 
 async def setup_blueprints(bot):

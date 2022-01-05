@@ -8,3 +8,4 @@ class Lesson:
         self.bell = schedule_element.bell
         self.subject = schedule_element.subject
         self.homework = homework
+        self.replace = schedule_element.replace

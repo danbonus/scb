@@ -1,7 +1,7 @@
 from enum import IntEnum
-from typing import Tuple, Type, Union, Optional
 
 from pydantic import BaseModel
+from typing import Tuple, Type, Union
 
 
 class BaseStateGroup(IntEnum):

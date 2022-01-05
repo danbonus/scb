@@ -1,27 +1,28 @@
-from vkbottle_overrides.bot import Blueprint
-from utils.args_object import SCB
-from constants.keyboards import RETURN_KEYBOARD
-from constants.states import GradeCreationStates
-from vkbottle_overrides.bot import Message
+from vkbottle import EMPTY_KEYBOARD
 
+from constants.states import GradeCreationStates
+from keyboards.misc import RETURN_KEYBOARD
+from utils.args_object import SCB
+from vkbottle_overrides.bot import Blueprint
+from vkbottle_overrides.bot import Message
 
 bp = Blueprint()
 bp.name = "Bells"
 
 
-@bp.on.message(text=["0", "1"], state=GradeCreationStates.FIRST_BELL)
+@bp.on.private_message(text=["0", "1"], state=GradeCreationStates.FIRST_BELL)
 async def first_bell_input(message: Message, scb: SCB):
     scb.storage["first_bell"] = message.text
-    await message.answer(scb.phrases.grade_creation.enter_bells % message.text, keyboard=RETURN_KEYBOARD)
+    await message.answer(scb.phrases.grade_creation.enter_bells % message.text, keyboard=EMPTY_KEYBOARD)
     await bp.state_dispenser.set(message.peer_id, GradeCreationStates.BELLS)
 
 
-@bp.on.message(state=GradeCreationStates.FIRST_BELL)
+@bp.on.private_message(state=GradeCreationStates.FIRST_BELL)
 async def first_bell_wrong(message: Message, scb: SCB):
     return scb.phrases.grade_creation.wrong_bell_format
 
 
-@bp.on.message(state=GradeCreationStates.BELLS)
+@bp.on.private_message(state=GradeCreationStates.BELLS)
 async def bells_input(message: Message, scb: SCB):
     msg = [i.split("-") for i in message.text.splitlines()]
     bells = {}

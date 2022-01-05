@@ -1,24 +1,14 @@
 from vkbottle_overrides.bot import Blueprint
-from utils.args_object import SCB
-from constants.keyboards import END_KEYBOARD, SUBJECTS_END_KEYBOARD, EMPTY_KEYBOARD, LANGUAGES_KEYBOARD, Text, iteration_keyboard
-from constants.keyboards import RETURN_KEYBOARD, SUBJECTS_KEYBOARD, CREATE_SUBJECT_KEYBOARD, LANGUAGES_KEYBOARD, Text, EMPTY_KEYBOARD
 
-from constants.states import GradesMenuStates, GradeCreationStates
-from vkbottle_overrides.bot import Message, rules
-from rules import IsMessageNotEmpty
-import re
-import pymorphy2
-import json
-from utils.api_test import Pagination
-from vkbottle import Callback, GroupEventType, GroupTypes
-
+'''from constants.keyboards import END_KEYBOARD, SUBJECTS_END_KEYBOARD, EMPTY_KEYBOARD, LANGUAGES_KEYBOARD, Text, iteration_keyboard
+from keyboards.misc import RETURN_KEYBOARD, SUBJECTS_KEYBOARD, CREATE_SUBJECT_KEYBOARD, LANGUAGES_KEYBOARD, Text, EMPTY_KEYBOARD'''
 
 bp = Blueprint()
 bp.name = "Subjects!!!"
 #bp.labeler.auto_rules = [IsMessageNotEmpty.IsMessageNotEmpty()]
 
 
-'''@bp.on.message(text="Завершить", state=GradeCreationStates.SUBJECTS)
+'''@bp.on.private_message(text="Завершить", state=GradeCreationStates.SUBJECTS)
 async def subjects_end(message: Message, scb: SCB):
     msg = "Предметы: \n"
     subjects = scb.storage["subjects_chosen"]
@@ -29,7 +19,7 @@ async def subjects_end(message: Message, scb: SCB):
     await bp.state_dispenser.set(message.peer_id, GradeCreationStates.SCHEDULE)
 
 
-@bp.on.message(state=GradeCreationStates.SUBJECTS)
+@bp.on.private_message(state=GradeCreationStates.SUBJECTS)
 async def subjects_input(message: Message, scb: SCB):
     info = scb.storage
     message.text = message.text.lower()

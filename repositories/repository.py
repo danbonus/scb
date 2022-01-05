@@ -1,5 +1,6 @@
-from utils.async_object import AsyncObject
 from motor.core import Collection
+
+from utils.async_object import AsyncObject
 
 
 class Repository(AsyncObject):
@@ -16,14 +17,13 @@ class Repository(AsyncObject):
     async def _get_record(self):
         ...
 
-    @staticmethod
-    async def get(name):
+    async def get(name, *args, **kwargs):
         ...
 
     async def update(self, **info):
         ...
 
-    async def delete(self, uid):
+    async def delete(self, *args, **kwargs):
         ...
 
     @property

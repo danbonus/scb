@@ -1,11 +1,10 @@
 import asyncio
 from abc import abstractmethod
 from typing import Any, NoReturn, Optional, Union
-
+from vkbottle import LoopWrapper
 from vkbottle.api import ABCAPI, API
 from vkbottle.dispatch import ABCRouter, ABCStateDispenser
 from vkbottle.polling import ABCPolling
-from vkbottle import LoopWrapper
 
 from .abc import ABCFramework
 

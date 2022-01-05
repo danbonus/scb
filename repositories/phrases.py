@@ -1,4 +1,5 @@
 from string import Template
+
 from languages import DefaultLanguage, languages
 from logger import logger
 
@@ -17,7 +18,7 @@ class PhrasesRepository(DefaultLanguage):
 
     def __init__(self, user, client_info, time):
         #logger.spam("PHrases rep init")
-        self.languages = [i().__name__ for i in languages]
+        self.languages = {i.__label__: i.__name__ for i in languages}
 
         for language in languages:  # итерация по доступным языкам
             if language().__name__ == user.lang:  # !!! __name__ класса переопределено чтобы скрыть переменную в IDE
@@ -44,6 +45,9 @@ class PhrasesRepository(DefaultLanguage):
                             args = Template.pattern.findall(value.safe_substitute())
 
                             if 'greeting' in [i[1] for i in args]:
+                                #logger.debug("Need to greet")
+                                #logger.debug(time.now().timestamp())
+                                #logger.debug(user.last_request.timestamp)
                                 if user.last_request.timestamp + 18000 < time.now().timestamp():  # нужно ли приветствовать
                                     value = value.safe_substitute(
                                             greeting=language.__greetings__[time.time_of_day()] % user.first_name

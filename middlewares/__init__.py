@@ -1,9 +1,11 @@
-from . import UserBlockedMiddleware, LogMiddleware, EmulationMiddleware, DebugMiddleware
+from . import ChatMiddleware, UserBlockedMiddleware, LogMiddleware, EmulationMiddleware, MaintenanceMiddleware, DebugMiddleware
 
 
 middlewares = [
+    ChatMiddleware.ChatMiddleware(),
     UserBlockedMiddleware.UserBlockedMiddleware(),
     LogMiddleware.LogMiddleware(),
     EmulationMiddleware.EmulationMiddleware(),
-    DebugMiddleware.DebugMiddleware()
+    #DebugMiddleware.DebugMiddleware(),
+    MaintenanceMiddleware.MaintenanceMiddleware()
 ]

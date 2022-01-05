@@ -6,7 +6,7 @@ async def user(uid):
         "uid": uid,
         "grade": None,
         "lang_group": None,
-        "ege_group": None,
+        "exam_group": None,
         "lang": "russian",
         "roles":
             {
@@ -16,11 +16,7 @@ async def user(uid):
             },
         "name_cases": await Api.get_cases(uid),
         "broadcast_user": False,
-        "broadcast_info":
-            {
-                "type": None,
-                "time": None
-            }
+        "broadcast_time": None
     }
 
     return user_model

@@ -1,23 +1,19 @@
 from abc import ABC
 from typing import Optional, Any, List, Callable
-
+from vkbottle import ABCDispenseView
+from vkbottle import GroupTypes
 from vkbottle.api.abc import ABCAPI
 from vkbottle.dispatch.dispenser.abc import ABCStateDispenser
-from vkbottle_overrides.dispatch.handlers.from_func_handler import ABCHandler
-from vkbottle_overrides.dispatch.middlewares.abc import BaseMiddleware
 from vkbottle.dispatch.middlewares import BaseMiddleware, MiddlewareResponse
 from vkbottle.dispatch.return_manager.bot import BotMessageReturnHandler
-from logger import logger
-from vkbottle.tools.dev_tools import message_min
 from vkbottle.tools.dev_tools.mini_types.bot import MessageMin
 from vkbottle_types.events import GroupEventType
-from vkbottle import ABCDispenseView
-from repositories.requests import RequestsRepository
-from collections import defaultdict
-from pydantic import BaseModel
-from utils.args_object import SCB
-from vkbottle import GroupTypes
 from vkbottle_types.state import StatePeer
+
+from logger import logger
+from utils.args_object import SCB
+from vkbottle_overrides.dispatch.handlers.from_func_handler import ABCHandler
+from vkbottle_overrides.dispatch.middlewares.abc import BaseMiddleware
 
 DEFAULT_STATE_KEY = "peer_id"
 
@@ -48,7 +44,7 @@ class ABCMessageEventView(ABCDispenseView, ABC):
 
         event.unprepared_ctx_api = ctx_api
         event.state_peer = await state_dispenser.cast(self.get_state_key(event))
-        print(event.state_peer)
+        #print(event.state_peer)
         #setattr(event, "state_peer", await state_dispenser.cast(self.get_state_key(event)))
 
         scb = await SCB(event, {"event": event, "handlers": self.handlers, "states": self.states})
@@ -74,8 +70,8 @@ class ABCMessageEventView(ABCDispenseView, ABC):
                 context_variables.update(result)
 
             scb.context.update(context_variables)
-            print(context_variables)
-            print(handler)
+            #print(context_variables)
+            #print(handler)
             handler_response = await handler.handle(event, scb, **context_variables)
             handle_responses.append(handler_response)
             handlers.append(handler)

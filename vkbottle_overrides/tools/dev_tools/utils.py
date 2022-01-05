@@ -1,12 +1,11 @@
+import importlib
+import os
+
+import re
 import typing
 
 from vkbottle_overrides.dispatch.rules.abc import ABCRule, AndFilter, OrFilter
 from vkbottle_overrides.framework.abc_blueprint import ABCBlueprint
-
-import importlib
-import os
-import re
-import typing
 
 
 def convert_shorten_filter(

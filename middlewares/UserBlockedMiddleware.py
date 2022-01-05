@@ -1,7 +1,8 @@
 from vkbottle import MiddlewareResponse
-from vkbottle_overrides.dispatch.middlewares.abc import BaseMiddleware
-from logger import logger
 from vkbottle.tools.dev_tools.mini_types.bot.message import MessageMin
+
+from logger import logger
+from vkbottle_overrides.dispatch.middlewares.abc import BaseMiddleware
 
 
 class UserBlockedMiddleware(BaseMiddleware):

@@ -1,32 +1,37 @@
-from vkbottle_overrides.bot import Blueprint
-from vkbottle.bot import Message
-from utils.args_object import SCB
-import datetime
-from string import Template
-from constants.states import EmulationStates
-from constants.keyboards import RETURN_KEYBOARD, EMULATION_DAY_KEYBOARD
-from rules.IsWriter import IsWriter
 import json
-from vkbottle.tools.dev_tools.loop_wrapper import LoopWrapper
-from asyncio import create_task
+from datetime import datetime
 
+from vkbottle import EMPTY_KEYBOARD
+from vkbottle.bot import Message
+
+from constants.states import EmulationStates
+from keyboards.emulation import EMULATION_DAY_KEYBOARD, CANCEL_EMULATION_KEYBOARD
+from keyboards.misc import RETURN_KEYBOARD, BACK_TO_MENU
+from utils.args_object import SCB
+from vkbottle_overrides.bot import Blueprint
 
 bp = Blueprint()
 bp.name = "Emulation"
 
 
-@bp.on.message(text="Эмуляция")
-@bp.on.message(payload={"cmd": "emulation"})
+@bp.on.private_message(text="Эмуляция")
+@bp.on.private_message(payload={"cmd": "emulation"})
 async def emulation(message: Message, scb: SCB):
     await bp.state_dispenser.set(message.peer_id, EmulationStates.EMULATION_DAY)
+
+    if "emulation_date" in scb.storage:
+        keyboard = EMULATION_DAY_KEYBOARD + CANCEL_EMULATION_KEYBOARD + BACK_TO_MENU
+    else:
+        keyboard = EMULATION_DAY_KEYBOARD + BACK_TO_MENU
+
     await message.answer(
         message="окей, выбери день",
-        keyboard=EMULATION_DAY_KEYBOARD + RETURN_KEYBOARD
+        keyboard=keyboard
     )
 
 
-@bp.on.message(payload_map={"emulation": str}, state=EmulationStates.EMULATION_DAY)
-@bp.on.message(text=["1", "2"], state=EmulationStates.EMULATION_DAY)
+@bp.on.private_message(payload_map={"emulation": str}, state=EmulationStates.EMULATION_DAY)
+@bp.on.private_message(text=["1", "2"], state=EmulationStates.EMULATION_DAY)
 async def emulation_input(message: Message, scb: SCB):
     if message.payload:
         day = json.loads(message.payload)["emulation"]
@@ -41,19 +46,19 @@ async def emulation_input(message: Message, scb: SCB):
         message.peer_id, EmulationStates.EMULATION_INPUT,
         day=day
     )
-    await message.answer(message="окей, вводи дату в формате 27.01.2021", keyboard=RETURN_KEYBOARD)
+    await message.answer(message="окей, вводи дату в формате 27.01.2021", keyboard=BACK_TO_MENU)
 
 
-@bp.on.message(state=EmulationStates.EMULATION_INPUT)
+@bp.on.private_message(state=EmulationStates.EMULATION_INPUT)
 async def emulation_input(message: Message, scb: SCB):
     date = message.text
     if message.state_peer.payload["day"] == "from":
-        scb.storage["emulation_date"] = date
+        scb.storage["emulation_date"] = datetime.strptime(date, "%d.%m.%Y").replace(hour=11)
     else:
-        scb.storage["emulation_date"] = scb.time.get_yesterday(date).strftime("%d.%m.%Y")
+        scb.storage["emulation_date"] = scb.time.get_yesterday(date).replace(hour=11)
 
     await bp.state_dispenser.delete(message.peer_id)
-    await message.answer(message="эмуляция активна. пиши дз. отключится через 20 минут.", keyboard=RETURN_KEYBOARD)
+    await message.answer(message="эмуляция активна. пиши дз. отключится через 20 минут.", keyboard=BACK_TO_MENU)
     bp.loop_wrapper.create_timer(emulation_timer, minutes=20, message=message, scb=scb)
 
 
@@ -62,7 +67,7 @@ async def emulation_timer(message: Message, scb: SCB):
     scb.storage.delete("emulation_date")
 
 
-@bp.on.message(text="⛔ Отключить эмуляцию")
+@bp.on.private_message(text="⛔ Отключить эмуляцию")
 async def off_emulation(message: Message, scb: SCB):
     scb.storage.delete("emulation_date")
-    return "эмуляция отключена"
+    await message.answer(message="эмуляция отключена", keyboard=BACK_TO_MENU)

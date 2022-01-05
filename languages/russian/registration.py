@@ -3,8 +3,8 @@ from string import Template
 
 class Registration:
     first_entry = {
-        "plain": Template("$greeting Ты тут в первый раз. Выбери один из доступных языков: $languages"),
-        "keyboard": Template("$greeting Ты тут в первый раз. Выбери один из доступных языков.")
+        "plain": Template("$greeting Ты тут в первый раз. Выбери один из доступных классов: grades"),
+        "keyboard": Template("$greeting Ты тут в первый раз. Выбери один из доступных классов.")
     }
 
     must_register = {

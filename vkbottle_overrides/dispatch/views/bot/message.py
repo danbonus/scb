@@ -1,22 +1,17 @@
-from asyncio import AbstractEventLoop
 from abc import ABC
 from typing import Optional, Any, List, Callable
-
 from vkbottle.api.abc import ABCAPI
-from vkbottle_overrides.dispatch.dispenser.abc import ABCStateDispenser
-from vkbottle_overrides.dispatch.handlers.from_func_handler import ABCHandler
-from vkbottle_overrides.dispatch.middlewares.abc import BaseMiddleware
-from vkbottle_overrides.dispatch.middlewares import BaseMiddleware, MiddlewareResponse
 from vkbottle.dispatch.return_manager.bot import BotMessageReturnHandler
-from logger import logger
 from vkbottle.tools.dev_tools import message_min
 from vkbottle.tools.dev_tools.mini_types.bot import MessageMin
 from vkbottle_types.events import GroupEventType
-from vkbottle_overrides.dispatch.views import ABCDispenseView
-from repositories.requests import RequestsRepository
-from collections import defaultdict
 
+from logger import logger
 from utils.args_object import SCB
+from vkbottle_overrides.dispatch.dispenser.abc import ABCStateDispenser
+from vkbottle_overrides.dispatch.handlers.from_func_handler import ABCHandler
+from vkbottle_overrides.dispatch.middlewares import BaseMiddleware, MiddlewareResponse
+from vkbottle_overrides.dispatch.views import ABCDispenseView
 
 DEFAULT_STATE_KEY = "peer_id"
 
@@ -38,7 +33,6 @@ class ABCMessageView(ABCDispenseView, ABC):
     ) -> Any:
         # logger.debug("Handling event ({}) with message view".format(event.get("event_id")))
         context_variables = {}
-
         message = message_min(event, ctx_api)
         message.state_peer = await state_dispenser.cast(self.get_state_key(event))
 
@@ -80,7 +74,7 @@ class ABCMessageView(ABCDispenseView, ABC):
             handlers.append(handler)
 
             if handler.handler.__name__ != "back_handler":
-                logger.debug("I'm appending a tree")
+                #logger.debug("I'm appending a tree")
                 await state_dispenser.set_tree(message.peer_id, handler, message)
 
 

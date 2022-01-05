@@ -11,7 +11,7 @@ class MyTime:
 
     def get_today(self):
         if 'emulation_date' in self.scb.storage:
-            return datetime.strptime(self.scb.storage["emulation_date"], "%d.%m.%Y").replace(hour=16)
+            return self.scb.storage["emulation_date"]
         else:
             return datetime.today()
 

@@ -1,7 +1,7 @@
-import logging
-import verboselogs
 import coloredlogs
+import logging
 import sys
+import verboselogs
 
 
 def logger_debug():
@@ -9,7 +9,7 @@ def logger_debug():
 
 
 logger = verboselogs.VerboseLogger('scb')
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 coloredlogs.DEFAULT_FIELD_STYLES['levelname'] = {"color": "blue"}
 coloredlogs.DEFAULT_FIELD_STYLES['asctime'] = {"color": "magenta"}

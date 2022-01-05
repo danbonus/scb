@@ -1,43 +1,32 @@
-from vkbottle_overrides.bot import Message
+import json
 
-from constants import *
-from vkbottle_overrides.bot import Blueprint
+from constants import RegistrationStates
+from keyboards.groups import groups_iteration
 from utils.args_object import SCB
-from constants import RegistrationStates, BroadcastStates
+from vkbottle_overrides.bot import Blueprint
+from vkbottle_overrides.bot import Message
 
 bp = Blueprint()
 bp.name = "Registration. Choose grade"
 
 
-'''@bp.on.message(text=["Пройти регистрацию", "1"], NotRegistered=True, state=RegistrationStates.REGISTRATION_START)
-async def reg_start(message: Message, scb: SCB):
-    """Начало регистрации, выбор класса."""
-    answer = scb.phrases.registration.reg_grade
-
-    GRADE_KEYBOARD = Keyboard(one_time=False, inline=False)
-
-    for grade in await scb.grades.list:
-        GRADE_KEYBOARD.add(Text(grade.label, {"grade": grade.label}), row=4, color=KeyboardButtonColor.PRIMARY)
-
-    if not message.client_info.keyboard:
-        answer += ', '.join(await scb.grades.list)
-
-    await message.answer(answer, keyboard=GRADE_KEYBOARD.get_json())
-    await bp.state_dispenser.set(message.peer_id, RegistrationStates.GRADE_CHECK)'''
-
-
-@bp.on.message(state=RegistrationStates.GRADE_CHECK)
+@bp.on.private_message(state=RegistrationStates.GRADE_CHECK)
 async def grade_check(message: Message, scb: SCB):
     """Проверка на существование класса."""
-
-    if await scb.grades.is_grade(message.text):
-        answer = "ок класс создан вся хуйня теперь и рассылочку можно\n\n"
-        answer += scb.phrases.broadcast.broadcast % message.text
-        keyboard = YN_KEYBOARD
-        scb.storage.set("grade", (grade := await scb.grades.get(message.text)))
-        await bp.state_dispenser.set(message.peer_id, BroadcastStates.ENABLE_BROADCAST)
-        await scb.user.register(grade.label)
+    payload = json.loads(message.payload)
+    if payload:
+        grade = await scb.grades.get(payload["grade"])
     else:
+        grade = await scb.grades.is_grade(message.text)
+
+    if not grade:
         return scb.phrases.registration.wrong_grade
 
-    await message.answer(answer, keyboard=keyboard)
+    answer = "ок класс указан вся хуйня теперь укажи группу\n\n"
+
+    #answer += scb.phrases.broadcast.broadcast % message.text
+    plain, keyboard = groups_iteration(grade.lang_groups)
+
+    await message.answer(message=answer, keyboard=keyboard)
+    scb.storage.set("grade", grade)
+    await bp.state_dispenser.set(message.peer_id, RegistrationStates.GET_LANG_GROUP)

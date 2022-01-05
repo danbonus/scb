@@ -1,4 +1,3 @@
-from string import Template
 from . import registration, grade_creation, broadcast, menu, subjects
 
 
@@ -39,6 +38,7 @@ class Constants:
 
 class DefaultLanguage:
     __name__ = "russian"
+    __label__ = "Русский"
     __greetings__ = {
         "greeting": "Ты можешь узнать список команд, введя <<команды>> без кавычек.",
         "morning": "🌅 | Доброе утро, %s!\n",

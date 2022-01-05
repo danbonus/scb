@@ -1,4 +1,5 @@
 from asyncio import sleep
+
 from typing import Any, Callable, Coroutine
 
 Handler = Callable[..., Coroutine[Any, Any, Any]]
@@ -12,7 +13,7 @@ class TimeTask:
 
     async def __call__(self, *args, **kwargs):
         while True:
-            print("sleeping for %s" % self.seconds)
+            #print("sleeping for %s" % self.seconds)
             await sleep(self.seconds)
             await self.handler(*args, **kwargs)
             if self.do_break:

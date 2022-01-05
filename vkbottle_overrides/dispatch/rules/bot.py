@@ -1,14 +1,12 @@
 import inspect
+
 import re
 import types
 import typing
+import vbml
 from abc import abstractmethod
 from typing import Awaitable, Callable, Coroutine, Dict, List, Optional, Tuple, Type, Union
-
-import vbml
 from vbml import Patcher
-from vkbottle_types import BaseStateGroup
-
 from vkbottle.tools.dev_tools.mini_types.bot.message import MessageMin
 from vkbottle.tools.validator import (
     ABCValidator,
@@ -16,9 +14,9 @@ from vkbottle.tools.validator import (
     EqualsValidator,
     IsInstanceValidator,
 )
+from vkbottle_types import BaseStateGroup
 
 from .abc import ABCRule
-
 
 DEFAULT_PREFIXES = ["!", "/"]
 Message = MessageMin
@@ -321,8 +319,8 @@ class PayloadMapRule(ABCMessageRule):
         return True
 
     async def check(self, message: Message, scb) -> bool:
-        print(message)
-        print(dir(message))
+        #print(message)
+        #print(dir(message))
         if isinstance(message, Message):
             payload = message.get_payload_json(unpack_failure=lambda p: {})
         else:

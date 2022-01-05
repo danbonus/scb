@@ -1,6 +1,6 @@
 from typing import Optional
-from vkbottle import KeyboardButtonColor, ABCAction
 from vkbottle import Keyboard as RootKeyboard
+from vkbottle import KeyboardButtonColor, ABCAction
 from vkbottle.tools.dev_tools.keyboard.button import KeyboardButton
 
 

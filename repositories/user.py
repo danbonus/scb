@@ -1,7 +1,7 @@
-from models.user import user
 from logger import logger
-from repositories.requests import RequestsRepository
+from models.user import user
 from repositories.repository import Repository
+from repositories.requests import RequestsRepository
 
 
 class UserRepository(Repository):
@@ -14,15 +14,13 @@ class UserRepository(Repository):
 
         self.grade = self.record["grade"]
         self.lang_group = self.record["lang_group"]
-        self.ege_group = self.record["ege_group"]
+        self.exam_group = self.record["exam_group"]
         self.registered = self.grade
 
         self.lang = self.record["lang"]
 
-        self.broadcast_info = self.record["broadcast_info"]
         self.is_broadcast_subscriber = self.record["broadcast_user"]
-        self.broadcast_type = self.broadcast_info["type"]
-        self.broadcast_time = self.broadcast_info["time"]
+        self.broadcast_time = self.record["broadcast_time"]
 
         self.roles = self.record["roles"]
         self.is_writer = self.roles["writer"]
@@ -62,8 +60,8 @@ class UserRepository(Repository):
     async def delete(self):
         await self._db.delete_one({"uid": self.uid})
 
-    async def register(self, grade):
-        await self.update(grade=grade, registered=True)
+    async def register(self, grade, lang_group, exam_group):
+        await self.update(grade=grade, lang_group=lang_group, exam_group=exam_group, registered=True)
 
-    async def set_broadcast(self, **broadcast_info):
-        await self.update(broadcast_user=True, broadcast_info=broadcast_info)
+    async def set_broadcast(self, broadcast_user, broadcast_time):
+        await self.update(broadcast_user=broadcast_user, broadcast_time=broadcast_time)

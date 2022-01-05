@@ -1,10 +1,8 @@
 import argparse
 
-from logger import logger
-from vkbottle_overrides.tools import CtxStorage
-
-from repositories import SettingsRepository
 from bot import init_bot
+from repositories import SettingsRepository
+from vkbottle_overrides.tools import CtxStorage
 
 
 async def beu():

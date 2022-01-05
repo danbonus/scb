@@ -1,9 +1,8 @@
 import os
+
 import sys
-
-from watchgod import awatch
-
 from vkbottle.modules import logger
+from watchgod import awatch
 
 _startup_cwd = os.getcwd()
 

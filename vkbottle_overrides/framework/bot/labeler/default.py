@@ -1,19 +1,13 @@
-from typing import Set, Tuple, Union
 import re
-from logger import logger
+import vbml
 from typing import Any, Callable, Dict, List, Set, Tuple, Type, Union
 from vkbottle.bot import BotLabeler
-from vkbottle_overrides.dispatch.rules.abc import ABCRule
-from vkbottle_overrides.tools.dev_tools.utils import convert_shorten_filter
-from vkbottle_overrides.dispatch.views.bot import MessageView, RawEventView
-from vkbottle_overrides.dispatch.handlers.from_func_handler import FromFuncHandler
-from vkbottle_overrides.dispatch.views import HandlerBasement, MessageView, RawEventView, MessageEventView
 from vkbottle.dispatch.views import ABCView
-import vbml
-from .abc import ABCBotLabeler, LabeledHandler, LabeledMessageHandler, EventName
 from vkbottle_types.events import GroupEventType
 
-
+from logger import logger
+from vkbottle_overrides.dispatch.handlers.from_func_handler import FromFuncHandler
+from vkbottle_overrides.dispatch.rules.abc import ABCRule
 from vkbottle_overrides.dispatch.rules.bot import (
     AttachmentTypeRule,
     ChatActionRule,
@@ -35,6 +29,9 @@ from vkbottle_overrides.dispatch.rules.bot import (
     MacroRule,
     VBMLRule,
 )
+from vkbottle_overrides.dispatch.views import HandlerBasement, MessageView, RawEventView, MessageEventView
+from vkbottle_overrides.tools.dev_tools.utils import convert_shorten_filter
+from .abc import LabeledHandler, LabeledMessageHandler, EventName
 
 ShortenRule = Union[ABCRule, Tuple[ABCRule, ...], Set[ABCRule]]
 DEFAULT_CUSTOM_RULES: Dict[str, Type[ABCRule]] = {
@@ -89,6 +86,38 @@ class SCBLabeler(BotLabeler):
                 )
             )
             #print(custom_rules)
+            if not func.__name__.startswith("back"):
+                if 'state' in custom_rules:
+                    if not isinstance(custom_rules['state'], list):
+                        custom_rules['state'] = [custom_rules['state']]
+                    for i in custom_rules['state']:
+                        if i in self.message_view.states:
+                            self.message_view.states[i].append(func.__name__)
+                        else:
+                            self.message_view.states[i] = [func.__name__]
+                else:
+                    if "NO_STATE" in self.message_view.states:
+                        self.message_view.states["NO_STATE"].append(func.__name__)
+                    else:
+                        self.message_view.states["NO_STATE"] = [func.__name__]
+            return func
+
+        return decorator
+
+    def private_message(
+        self, *rules: ShortenRule, blocking: bool = True, **custom_rules
+    ) -> LabeledMessageHandler:
+        def decorator(func):
+            self.message_view.handlers.append(
+                FromFuncHandler(
+                    func,
+                    PeerRule(False),
+                    *map(convert_shorten_filter, rules),
+                    *self.auto_rules,
+                    *self.get_custom_rules(custom_rules),
+                    blocking=blocking,
+                )
+            )
             if not func.__name__.startswith("back"):
                 if 'state' in custom_rules:
                     if not isinstance(custom_rules['state'], list):

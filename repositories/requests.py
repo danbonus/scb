@@ -1,7 +1,10 @@
-from repositories.repository import Repository
-from logger import logger
-from string import ascii_lowercase, digits
 import random
+from string import ascii_lowercase, digits
+from typing import List, Union
+
+from datetime import datetime, time
+
+from repositories.repository import Repository
 
 
 class RequestsRepository(Repository):
@@ -35,20 +38,20 @@ class RequestsRepository(Repository):
         self.event = self.record["event"]
 
     @classmethod
-    async def create(cls, message, event):
+    async def create(cls, from_id, text, date, state_peer, event):
         alphabet = ascii_lowercase + digits
         request_id = ''.join(random.choices(alphabet, k=8))
 
         await (await cls())._db.insert_one(
             {
                 "request_id": request_id,
-                "uid": message.from_id,
-                "message": message.text,
-                "timestamp": message.date,
+                "uid": from_id,
+                "message": text,
+                "timestamp": date,
                 "handler": "not handled yet",
                 "return_command": False,
                 "event": event,
-                "state": message.state_peer.state if message.state_peer else 0
+                "state": state_peer.state if state_peer else 0
             }
         )
         return request_id
@@ -80,31 +83,16 @@ class RequestsRepository(Repository):
         last_request: RequestsRepository = await RequestsRepository(request_id=last_record["request_id"])
         return last_request
 
-    async def get_penultimate_request(self):
-        last_record = await self._db.find({"uid": self.uid}, sort=[("timestamp", -1)]).to_list(2)
-        last_record = last_record[1]
-        # logger.debug(last_request)
-        last_request: RequestsRepository = await RequestsRepository(last_record["request_id"])
-        return last_request
+    async def get_last_handler_by_label(self, uid, handlers) -> Union[List["RequestsRepository"], List]:
+        end = datetime.today().timestamp()  #
+        start = end - 86400
+        requests = []
+        for i in handlers:
+            last_handler = await self._db.find_one({"uid": uid, "handler": i, "timestamp": {"$gt": start, "$lt": end}}, sort=[("timestamp", -1)])
+            if last_handler:
+                requests.append(last_handler)
+                break
 
-    async def get_request_by_index(self, record_num):
-        records = await self._db.find(
-            {"uid": self.uid, "return_command": False}, sort=[("timestamp", -1)]
-        ).to_list(15)
-        last_record = records[record_num]
-        # logger.debug(last_request)
-        last_request: RequestsRepository = await RequestsRepository(last_record["request_id"])
-        return last_request
-
-    async def get_last_requests_by_count(self, handler, num_skip, num):
-        record = await self._db.find_one({"uid": self.uid, "handler": handler, "return_command": False}, sort=[("timestamp", -1)])
-        #logger.error("Getting Records: %s" % records)
-        # logger.debug(last_request)
-        #requests: List[RequestsRepository] = [await RequestsRepository(record["request_id"]) for record in records]
-        return record
-
-    async def get_stateless_requests_by_count(self, handler, num_skip, num):
-        records = await self._db.find({"uid": self.uid, "return_command": False, "handler": handler, "state": 0}, sort=[("timestamp", -1)]).skip(num_skip).to_list(num)
-        # logger.debug(last_request)
-        #requests: List[RequestsRepository] = [await RequestsRepository(record["request_id"]) for record in records]
-        return records
+        #if requests:
+        #    return [await RequestsRepository(request_id=i["request_id"]) for i in requests]
+        return [await RequestsRepository(request_id=i["request_id"]) for i in requests]

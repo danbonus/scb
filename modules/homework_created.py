@@ -1,5 +1,6 @@
-from constants import HOMEWORK_OPERATIONS_KEYBOARD
+from keyboards.homework import HOMEWORK_KEYBOARD
 from utils.args_object import SCB
+from datetime import datetime
 
 
 async def final(message, scb: SCB):
@@ -10,9 +11,17 @@ async def final(message, scb: SCB):
         to=scb.storage["deadline"],
         sender=scb.user.uid
     )
+    days = scb.phrases.constants.days
     for record in records:
-        await message.answer("дз добавлено вся хуйня \nПредмет: %s\nДЗ: %s\nДо какого числа: %s" % (
-            record["subject"], record["homework"], record["to"]
-        ), keyboard=HOMEWORK_OPERATIONS_KEYBOARD)
+        await message.answer(
+            "дз добавлено вся хуйня \nПредмет: %s\nДЗ: %s\nС какого числа: %s, %s\nДо какого числа: %s, %s" % (
+                record["subject"],
+                record["homework"],
+                datetime.fromtimestamp(record["timestamp"]).strftime("%d.%m.%Y"),
+                days[str(datetime.fromtimestamp(record["timestamp"]).weekday())].lower(),
+                datetime.fromtimestamp(record["to"]).strftime("%d.%m.%Y"),
+                days[str(datetime.fromtimestamp(record["to"]).weekday())].lower(),
+            ),
+            keyboard=HOMEWORK_KEYBOARD)
     for i in ["subject_to_fill", "homework_text", "attachments", "deadline"]:
         scb.storage.delete(i)

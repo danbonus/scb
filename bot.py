@@ -1,17 +1,18 @@
-from vkbottle_overrides.tools.dev_tools.loop_wrapper import LoopWrapper
 from logger import logger
 from middlewares import middlewares
+from middlewares.EventAnswerMiddleware import EventAnswerMiddleware
+from middlewares.OutdatedEventMiddleware import OutdatedEventMiddleware
+from modules.change_title import change_title
 from rules import rules
 from utils.api import Api
-from vkbottle_overrides.bot import Bot
-from vkbottle_overrides.tools.dev_tools.utils import load_blueprints_from_package
-from vkbottle_overrides.tools import CtxStorage
-from vkbottle_overrides.bot import SCBLabeler
-import argparse
-from vkbottle_overrides.dispatch.dispenser import BuiltinStateDispenser
 from utils.broadcast import broadcast
-from middlewares.OutdatedEventMiddleware import OutdatedEventMiddleware
-from middlewares.EventAnswerMiddleware import EventAnswerMiddleware
+from vkbottle_overrides.bot import Bot
+from vkbottle_overrides.bot import SCBLabeler
+from vkbottle_overrides.dispatch.dispenser import BuiltinStateDispenser
+from vkbottle_overrides.tools.dev_tools.loop_wrapper import LoopWrapper
+from vkbottle_overrides.tools.dev_tools.utils import load_blueprints_from_package
+import aioschedule as schedule
+from modules.writers_reminder import remind_writers
 
 
 def init_bot(token) -> Bot:
@@ -21,16 +22,20 @@ def init_bot(token) -> Bot:
     bot.state_dispenser = BuiltinStateDispenser()
     bot.labeler = SCBLabeler()
     bot.labeler.vbml_ignore_case = True  # беу == БЕУ == бЕу
+
     lw.on_startup.extend(
         [
             setup_api(bot),
             setup_rules(bot),
             setup_blueprints(bot),
-            setup_middlewares(bot)
+            setup_middlewares(bot),
         ]
     )
-    lw.create_interval(broadcast, seconds=40)
-
+    #lw.create_timer(broadcast, seconds=40)
+    lw.create_interval(change_title, minutes=10, api=Api)
+    #lw.create_timer(remind_writers, schedule=schedule, seconds=1)
+    lw.create_interval(schedule.run_pending, seconds=1)
+    #lw.create_timer(schedule.run_pending, seconds=1)
     return bot
 
 
@@ -48,12 +53,18 @@ async def setup_blueprints(bot):
     blueprints = {}
     at_start = {
         "First Entry": None,
+        "Registration: choose language": None,
+        "Registration. Choose grade": None,
+        "Registration. Choose lang group": None,
+        "Registration. Choose exam group": None,
+        "Registration": None,
+        "Menu: cmd": None,
         "Back Handler": None,
         "HW ADD: attachments": None,
-        "HW ADD: text": None
+        "HW ADD: text": None,
+        "HW ADD: final": None
     }
     at_final = {
-        "Registration": None,
         "Menu": None
     }
 
@@ -75,7 +86,7 @@ async def setup_blueprints(bot):
 
     for i in blueprints:
         blueprints[i].load(bot)
-        logger.debug("Loading handler: %s" % i)
+        #logger.debug("Loading handler: %s" % i)
 
     for i in at_final:
         at_final[i].load(bot)

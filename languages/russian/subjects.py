@@ -4,7 +4,6 @@
 # accs = винительный (вижу кого, что?)
 # ablt = творительный (доволен кем, чем?)
 # loct = предложный (думаю о чём, ком?)
-from dataclasses import dataclass
 
 
 class Subject:
@@ -22,7 +21,7 @@ class Subject:
     emoji: str
 
     lang_group: int = 0
-    ege_group: int = 0
+    exam_group: int = 0
 
 '''
 class GroupSubject(Subject):
@@ -92,7 +91,7 @@ class Geometry(Subject):
 class GeometryEl(Geometry, Subject):
     label = "geometry-el"
 
-    nomn = "Геометрия (эл.)"
+    nomn = "Планиметрия (эл.)"
     gent = "геометрии (эл.)"
     datv = "геометрии (эл.)"
     accs = "геометрию (эл.)"
@@ -274,14 +273,14 @@ class BiologyEGE(BiologyEl, Subject):
     label = "biology-el1"
     name = " ЕГЭ"
     # nomn = Biology.nomn + teacher_name
-    ege_group = 1
+    exam_group = 1
 
 
 class BiologyNonEGE(BiologyEl, Subject):
     label = "biology-el2"
     name = " неЕГЭ"
     # nomn = Biology.nomn + teacher_name
-    ege_group = 2
+    exam_group = 2
 
 
 class Physics(Subject):
@@ -333,13 +332,13 @@ class ChemistryEl(Chemistry, Subject):
 class ChemistryEGE(ChemistryEl, Subject):
     label = "chemistry-el1"
     name = " (ЕГЭ)"
-    ege_group = 1
+    exam_group = 1
 
 
 class ChemistryNonEGE(ChemistryEl, Subject):
     label = "chemistry-el2"
     name = " (неЕГЭ)"
-    ege_group = 2
+    exam_group = 2
 
 
 class LifeSafetyFundamentals(Subject):
@@ -784,9 +783,25 @@ class IndividualProject(Subject):
     emoji = "👨‍🏫"
 
 
+
+class Talks(Subject):
+    label = "talks"
+
+    nomn = "Классный час"
+    gent = "классного часа"
+    datv = "классному часу"
+    accs = "классный час"
+    ablt = "классным часом"
+    loct = "о классном часе"
+
+    shorts = ["клч", "классный час"]
+
+    emoji = "[?]"
+
+
 ####################
 
 
 class DefaultSubjects:
     default = [i for i in Subject.__subclasses__()]
-    print(default)
+    #print(default)

@@ -1,8 +1,7 @@
 #from vkbottle_overrides.bot import Blueprint
 from vkbottle import API
-from vkbottle_overrides.tools import CtxStorage
 from vkbottle import vkscript
-from logger import logger
+
 
 #bp = Blueprint()
 
@@ -52,7 +51,7 @@ class Api:
 
         code = cases(uid=uid, cases_=cases_list)
         result = (await cls.api.execute(code=code))["response"][::-1]
-
+        print(result)
         for index, i in enumerate(result):
             i = i[0]
             cases_dict[cases_list[index]] = {

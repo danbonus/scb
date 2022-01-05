@@ -1,9 +1,8 @@
 import typing
 
 from vkbottle_overrides.tools.dev_tools.ctx_tool import BaseContext
-
 from .abc import ABCStorage
-from logger import logger
+
 
 class CtxStorage(ABCStorage, BaseContext):
     """ Context storage

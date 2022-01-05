@@ -1,14 +1,14 @@
+from configparser import ConfigParser
 from distutils.util import strtobool
 
-from logger import logger_debug, logger
 from motor.motor_asyncio import AsyncIOMotorClient
-from vkbottle_overrides.tools import CtxStorage
-from configparser import ConfigParser
+from vkbottle import API
+
+from logger import logger_debug, logger
 from repositories import GradesRepository
 from repositories.repository import Repository
-
 from utils.api import Api
-from vkbottle import API
+from vkbottle_overrides.tools import CtxStorage
 
 
 class SettingsRepository:
@@ -63,7 +63,7 @@ class SettingsRepository:
         Api.group_id = group_id
 
         if self.init_group_id:
-            if group_id != self.init_group_id:
+            '''if group_id != self.init_group_id:
                 logger.error("You've changed the bot group. 'Y' to refresh the grades DB (album IDs change).")
                 try:
                     if strtobool(input()):
@@ -72,7 +72,7 @@ class SettingsRepository:
                 except ValueError:
                     pass
 
-                exit(-1)
+                exit(-1)'''
         else:
             logger.info("First start! Saving the group id.")
             self.set("init_group_id", group_id)

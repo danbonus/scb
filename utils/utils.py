@@ -16,3 +16,11 @@ def choice_book(hw):
         book = books_names[hw]
 
     return book
+
+
+async def process_text(text):
+    if not text.endswith("."):
+        text += "."
+    if text[0].isupper():
+        text = text[0].lower() + text[1:]
+    return text

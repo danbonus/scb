@@ -1,12 +1,10 @@
-from asyncio import AbstractEventLoop, get_event_loop
 from typing import Dict
-
 from vkbottle.api.abc import ABCAPI
-from vkbottle_overrides.dispatch.dispenser import ABCStateDispenser
-from vkbottle_overrides.dispatch.views import ABCView
 from vkbottle.exception_factory import ABCErrorHandler
 from vkbottle.modules import logger
 
+from vkbottle_overrides.dispatch.dispenser import ABCStateDispenser
+from vkbottle_overrides.dispatch.views import ABCView
 from .abc import ABCRouter
 
 
@@ -19,7 +17,7 @@ class BotRouter(ABCRouter):
                 if not await view.process_event(event):
                     continue
 
-                print(event)
+                #print(event)
                 await view.handle_event(event, ctx_api, self.state_dispenser)
             except BaseException as e:
                 await self.error_handler.handle(e)

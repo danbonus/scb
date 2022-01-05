@@ -1,6 +1,5 @@
-from vkbottle_overrides.bot import rules, Message, SCB
-
 from logger import logger
+from vkbottle_overrides.bot import rules, Message, SCB
 
 
 class FirstEntry(rules.ABCMessageRule):

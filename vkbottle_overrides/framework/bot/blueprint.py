@@ -1,13 +1,11 @@
-from vkbottle_overrides.framework.abc_blueprint import ABCBlueprint
-
 from typing import Optional, Union
-
 from vkbottle.api import ABCAPI, API
+from vkbottle.polling import ABCPolling
+
 from vkbottle_overrides.dispatch import ABCStateDispenser, BotRouter
+from vkbottle_overrides.framework.abc_blueprint import ABCBlueprint
 from vkbottle_overrides.framework.bot.bot import Bot
 from vkbottle_overrides.framework.bot.labeler import SCBLabeler
-from logger import logger
-from vkbottle.polling import ABCPolling
 from vkbottle_overrides.tools.dev_tools.loop_wrapper import LoopWrapper
 
 
